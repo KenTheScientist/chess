@@ -34,6 +34,17 @@ public class ChessPiece {
         return Objects.hash(pieceColor, type);
     }
 
+    @Override
+    public String toString() {
+        String options = "kqbnrp";
+        int index = type.ordinal();
+        char out = options.charAt(0);
+        if(pieceColor == ChessGame.TeamColor.WHITE) out = Character.toUpperCase(out);
+
+        return String.valueOf(out);
+
+    }
+
     /**
      * The various different chess piece options
      */
@@ -217,7 +228,7 @@ public class ChessPiece {
 
         }
         else if(type == PieceType.ROOK) {
-            //Go up and right
+
             int checkingCol = myCol;
             int checkingRow = myRow;
 
@@ -284,13 +295,236 @@ public class ChessPiece {
                 }
             }
         }
+        else if(type == PieceType.QUEEN) {
 
+            int checkingCol = myCol;
+            int checkingRow = myRow;
+
+            while (true)//UP
+            {
+                checkingRow++;
+
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//RIGHT
+            {
+                checkingCol++;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//DOWN
+            {
+                checkingRow--;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//LEFT
+            {
+                checkingCol--;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+
+            while (true)//UP AND RIGHT
+            {
+                checkingRow++;
+                checkingCol++;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//DOWN AND LEFT
+            {
+                checkingRow--;
+                checkingCol--;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//UP AND LEFT
+            {
+                checkingRow++;
+                checkingCol--;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//DOWN AND RIGHT
+            {
+                checkingRow--;
+                checkingCol++;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        else if(type == PieceType.PAWN){
+
+            if(pieceColor == ChessGame.TeamColor.BLACK){
+                //Heading DOWN
+                //Attack LEFTDOWN
+                if(moveValid(board, new ChessPosition(myRow-1,myCol-1),pieceColor)){
+                    if(board.hasPiece(new ChessPosition(myRow-1,myCol-1))){
+                        //Ready for attack
+                        possiblePositions.add(new ChessPosition(myRow-1,myCol-1));
+                    }
+                }
+                //Attack RIGHTDOWN
+                if(moveValid(board, new ChessPosition(myRow-1,myCol+1),pieceColor)){
+                    if(board.hasPiece(new ChessPosition(myRow-1,myCol+1))){
+                        //Ready for attack
+                        possiblePositions.add(new ChessPosition(myRow-1,myCol+1));
+                    }
+                }
+                //Move down if no one's there
+                if(moveValid(board, new ChessPosition(myRow-1,myCol),pieceColor)){
+                    if(!board.hasPiece(new ChessPosition(myRow-1,myCol))) {
+                        possiblePositions.add(new ChessPosition(myRow - 1, myCol));
+                    }
+                }
+                //Move 2 if on start
+                if(myRow == 7){
+                    if(moveValid(board, new ChessPosition(myRow-2,myCol),pieceColor)){
+                        if(!board.hasPiece(new ChessPosition(myRow-1,myCol)) && !board.hasPiece(new ChessPosition(myRow-2,myCol))) {
+                            possiblePositions.add(new ChessPosition(myRow - 2, myCol));
+                        }
+                    }
+                }
+
+            }
+            else if(pieceColor == ChessGame.TeamColor.WHITE){
+                //Heading UP
+                //Attack LEFTUP
+                if(moveValid(board, new ChessPosition(myRow+1,myCol-1),pieceColor)){
+                    if(board.hasPiece(new ChessPosition(myRow+1,myCol-1))){
+                        //Ready for attack
+                        possiblePositions.add(new ChessPosition(myRow+1,myCol-1));
+                    }
+                }
+                //Attack RIGHTUP
+                if(moveValid(board, new ChessPosition(myRow+1,myCol+1),pieceColor)){
+                    if(board.hasPiece(new ChessPosition(myRow+1,myCol+1))){
+                        //Ready for attack
+                        possiblePositions.add(new ChessPosition(myRow+1,myCol+1));
+                    }
+                }
+                //Move up if no one's there
+                if(moveValid(board, new ChessPosition(myRow+1,myCol),pieceColor)){
+                    if(!board.hasPiece(new ChessPosition(myRow+1,myCol))) {
+                        possiblePositions.add(new ChessPosition(myRow + 1, myCol));
+                    }
+                }
+                //Move 2 if on start
+                if(myRow == 2){
+                    if(moveValid(board, new ChessPosition(myRow+2,myCol),pieceColor)){
+                        if(!board.hasPiece(new ChessPosition(myRow+1,myCol)) && !board.hasPiece(new ChessPosition(myRow+2,myCol))) {
+                            possiblePositions.add(new ChessPosition(myRow + 2, myCol));
+                        }
+                    }
+                }
+
+            }
+        }
 
 
 
         //Now fill the possibleMoves collection using the possible positions
-        for(ChessPosition pos : possiblePositions){
-            possibleMoves.add(new ChessMove(myPosition, pos, null));
+
+        if(type != PieceType.PAWN) {
+            for (ChessPosition pos : possiblePositions) {
+                possibleMoves.add(new ChessMove(myPosition, pos, null));
+            }
+        }
+        else
+        {
+            //Check if we're promoting
+            if((pieceColor == ChessGame.TeamColor.WHITE && myRow == 7) || (pieceColor == ChessGame.TeamColor.BLACK && myRow == 2)) {
+                for (ChessPosition pos : possiblePositions) {
+                    possibleMoves.add(new ChessMove(myPosition, pos, PieceType.QUEEN));
+                    possibleMoves.add(new ChessMove(myPosition, pos, PieceType.ROOK));
+                    possibleMoves.add(new ChessMove(myPosition, pos, PieceType.BISHOP));
+                    possibleMoves.add(new ChessMove(myPosition, pos, PieceType.KNIGHT));
+                }
+            }
+            else{
+                for (ChessPosition pos : possiblePositions) {
+                    possibleMoves.add(new ChessMove(myPosition, pos, null));
+                }
+            }
         }
 
         return possibleMoves;

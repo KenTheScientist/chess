@@ -13,13 +13,38 @@ public class ChessBoard {
 
     ChessPiece[][] board = new ChessPiece[8][8];
 
+//    @Override
+//    public boolean equals(Object o) {
+//        if (o == null || getClass() != o.getClass()) {
+//            return false;
+//        }
+//        if(o == this){
+//            return true;
+//        }
+//        ChessBoard that = (ChessBoard) o;
+//        for(int i = 0; i < board.length; i++){
+//            for(int j = 0; j < board[i].length; j++){
+//                if(board[i][j] != that.board[i][j]){
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
+
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
+
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ChessBoard that = (ChessBoard) o;
-        return Objects.deepEquals(board, that.board);
+        if(o == this){
+            return true;
+        }
+
+
+        return (Objects.equals(o.toString(), this.toString()));
     }
 
     @Override
@@ -30,6 +55,36 @@ public class ChessBoard {
     public ChessBoard() {
 
     }
+
+    @Override
+    public String toString() {
+
+        String out = "";
+
+        for(int i = 8; i > 0; i--)
+        {
+            for(int j = 1; j < 9; j++)
+            {
+                out += "|";
+                ChessPiece renderingPiece = board[i-1][j-1];
+                if(renderingPiece != null)
+                {
+                    out += renderingPiece.toString();
+                }
+                else
+                {
+                    out += " ";
+                }
+
+            }
+            out += "|\n";
+        }
+
+        return out;
+    }
+
+
+
 
     /**
      * Adds a chess piece to the chessboard
@@ -50,6 +105,10 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return board[position.getRow()-1][position.getColumn()-1];
+    }
+
+    public ChessPiece[][] getBoard(){
+        return board;
     }
 
     public boolean hasPiece(ChessPosition position) {
