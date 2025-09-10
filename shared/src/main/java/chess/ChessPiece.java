@@ -60,6 +60,20 @@ public class ChessPiece {
         return this.type;
     }
 
+
+    /**
+     * Calculates whether a move is valid or not, given a move-to position and color on a board
+     */
+
+    public boolean moveValid(ChessBoard board, ChessPosition pos, ChessGame.TeamColor col)
+    {
+        if(pos.getColumn() < 1 || pos.getColumn() > 8 || pos.getRow() < 1 || pos.getRow() > 8) return false; // Out of bounds
+        if(board.hasPiece(pos)){
+            if(board.getPiece(pos).getTeamColor() == col) return false; //We're on the same team!!!
+        }
+        return true;
+    }
+
     /**
      * Calculates all the positions a chess piece can move to
      * Does not take into account moves that are illegal due to leaving the king in
@@ -69,8 +83,8 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
-        Collection<ChessPosition> possiblePositions = new ArrayList<ChessPosition>(); //List of possible move-to positions
-        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>(); //Output list of ChessMoves
+        Collection<ChessPosition> possiblePositions = new ArrayList<>(); //List of possible move-to positions
+        Collection<ChessMove> possibleMoves = new ArrayList<>(); //Output list of ChessMoves
 
         int myCol = myPosition.col;
         int myRow = myPosition.row;
@@ -85,48 +99,16 @@ public class ChessPiece {
                 {
                     checkingRow++;
                     checkingCol++;
-                    if(checkingCol > 8 || checkingRow > 8){
-                        break;
-                    }
-                    else{
+                    if(moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)){
                         possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
                         if(board.hasPiece(new ChessPosition(checkingRow, checkingCol))){
+                            //We ran into an enemy piece
                             break;
                         }
                     }
-                }
-
-                checkingCol = myCol;
-                checkingRow = myRow;
-                while(true)//UP AND LEFT
-                {
-                    checkingRow++;
-                    checkingCol--;
-                    if(checkingCol < 1 || checkingRow > 8){
+                    else
+                    {
                         break;
-                    }
-                    else{
-                        possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
-                        if(board.hasPiece(new ChessPosition(checkingRow, checkingCol))){
-                            break;
-                        }
-                    }
-                }
-
-                checkingCol = myCol;
-                checkingRow = myRow;
-                while(true)//DOWN AND RIGHT
-                {
-                    checkingRow--;
-                    checkingCol++;
-                    if(checkingCol > 8 || checkingRow < 1){
-                        break;
-                    }
-                    else{
-                        possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
-                        if(board.hasPiece(new ChessPosition(checkingRow, checkingCol))){
-                            break;
-                        }
                     }
                 }
 
@@ -136,14 +118,54 @@ public class ChessPiece {
                 {
                     checkingRow--;
                     checkingCol--;
-                    if(checkingCol < 1 || checkingRow < 1){
-                        break;
-                    }
-                    else{
+                    if(moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)){
                         possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
                         if(board.hasPiece(new ChessPosition(checkingRow, checkingCol))){
+                            //We ran into an enemy piece
                             break;
                         }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                checkingCol = myCol;
+                checkingRow = myRow;
+                while(true)//UP AND LEFT
+                {
+                    checkingRow++;
+                    checkingCol--;
+                    if(moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)){
+                        possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                        if(board.hasPiece(new ChessPosition(checkingRow, checkingCol))){
+                            //We ran into an enemy piece
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                checkingCol = myCol;
+                checkingRow = myRow;
+                while(true)//DOWN AND RIGHT
+                {
+                    checkingRow--;
+                    checkingCol++;
+                    if(moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)){
+                        possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                        if(board.hasPiece(new ChessPosition(checkingRow, checkingCol))){
+                            //We ran into an enemy piece
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
 
