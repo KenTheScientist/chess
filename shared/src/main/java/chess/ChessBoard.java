@@ -39,12 +39,21 @@ public class ChessBoard {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        if(o == this){
-            return true;
+
+        //System.out.println("COMPARING TO: \n" + o.toString());
+        //System.out.println("COMPARING FROM: \n" + this.toString());
+
+        ChessBoard that = (ChessBoard) o;
+        for(int i = 0; i < board.length; i++){
+            for(int j = 0; j < board[i].length; j++){
+                if(board[i][j] != that.board[i][j]){
+                    return false;
+                }
+            }
         }
 
-
-        return (Objects.equals(o.toString(), this.toString()));
+        return true;
+        //return (Objects.equals(o.toString(), this.toString()));
     }
 
     @Override
