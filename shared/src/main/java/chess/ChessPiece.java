@@ -216,9 +216,73 @@ public class ChessPiece {
             }
 
         }
-        else if(type == PieceType.PAWN)
-        {
+        else if(type == PieceType.ROOK) {
+            //Go up and right
+            int checkingCol = myCol;
+            int checkingRow = myRow;
 
+            while (true)//UP
+            {
+                checkingRow++;
+
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//RIGHT
+            {
+                checkingCol++;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//DOWN
+            {
+                checkingRow--;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            checkingCol = myCol;
+            checkingRow = myRow;
+            while (true)//LEFT
+            {
+                checkingCol--;
+                if (moveValid(board, new ChessPosition(checkingRow, checkingCol), pieceColor)) {
+                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    if (board.hasPiece(new ChessPosition(checkingRow, checkingCol))) {
+                        //We ran into an enemy piece
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            }
         }
 
 
