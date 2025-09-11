@@ -38,7 +38,8 @@ public class ChessPiece {
     public String toString() {
         String options = "kqbnrp";
         int index = type.ordinal();
-        char out = options.charAt(0);
+        char out = options.charAt(index);
+
         if(pieceColor == ChessGame.TeamColor.WHITE) out = Character.toUpperCase(out);
 
         return String.valueOf(out);
