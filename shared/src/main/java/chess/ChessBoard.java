@@ -13,25 +13,6 @@ public class ChessBoard {
 
     ChessPiece[][] board = new ChessPiece[8][8];
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (o == null || getClass() != o.getClass()) {
-//            return false;
-//        }
-//        if(o == this){
-//            return true;
-//        }
-//        ChessBoard that = (ChessBoard) o;
-//        for(int i = 0; i < board.length; i++){
-//            for(int j = 0; j < board[i].length; j++){
-//                if(board[i][j] != that.board[i][j]){
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
-
     @Override
     public boolean equals(Object o)
     {
@@ -40,17 +21,6 @@ public class ChessBoard {
             return false;
         }
 
-        //System.out.println("COMPARING TO: \n" + o.toString());
-        //System.out.println("COMPARING FROM: \n" + this.toString());
-
-//        ChessBoard that = (ChessBoard) o;
-//        for(int i = 0; i < board.length; i++){
-//            for(int j = 0; j < board[i].length; j++){
-//                if(board[i][j] != that.board[i][j]){
-//                    return false;
-//                }
-//            }
-//        }
 
         //return true;
         return (Objects.equals(o.toString(), this.toString()));
@@ -65,6 +35,7 @@ public class ChessBoard {
 
     }
 
+    @SuppressWarnings("StringConcatenationInLoop")
     @Override
     public String toString() {
 
