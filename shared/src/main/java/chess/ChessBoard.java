@@ -35,6 +35,19 @@ public class ChessBoard {
 
     }
 
+
+    public ChessBoard duplicate() {
+        ChessBoard newBoard = new ChessBoard();
+        for(int i = 1; i < 9; i++)
+        {
+            for(int j = 1; j < 9; j++)
+            {
+                newBoard.addPiece(new ChessPosition(i,j),getPiece(new ChessPosition(i,j)));
+            }
+        }
+        return newBoard;
+    }
+
     @SuppressWarnings("StringConcatenationInLoop")
     @Override
     public String toString() {
@@ -89,6 +102,10 @@ public class ChessBoard {
 
     public ChessPiece[][] getBoard(){
         return board;
+    }
+
+    public void setBoard(ChessPiece[][] settingBoard){
+        board = settingBoard;
     }
 
     public boolean hasPiece(ChessPosition position) {
