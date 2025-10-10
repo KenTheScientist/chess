@@ -10,6 +10,6 @@ public interface GameDAO {
     public void createGame(GameData gameData);
     public GameData getGame(int gameID);
     public ArrayList<GameData> listGames();
-    public void updateGame(int gameID, String chessGame);
+    public void updateGame(int gameID, GameData replacingGameData) throws DataAccessException;
 
 }

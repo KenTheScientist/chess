@@ -20,7 +20,7 @@ public class Server {
         //Logs out an authenticated user
         javalin.delete("/session", context -> (new LogoutHandler()).handle(context));
         //Lists all the games in the database
-        javalin.get("/game", context -> (new RegisterHandler()).handle(context));
+        javalin.get("/game", context -> (new ListGamesHandler()).handle(context));
         //Create a new Chess game
         javalin.post("/game", context -> (new RegisterHandler()).handle(context));
         //Join a Chess Game

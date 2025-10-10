@@ -58,15 +58,15 @@ public class UserService {
             return new LoginResult(request.username(), generatedAuthtoken);
         }
     }
-    public static void logout(LogoutRequest request) throws UnauthorizedException {
+    public static void logout(LogoutRequest request) throws DataAccessException {
         AuthData searchedAuthData = memoryAuthDAO.getAuth(request.authToken());
-        if(searchedAuthData != null)
-        {
+        if(searchedAuthData != null) {
             //Found a match
+            memoryAuthDAO.deleteAuth(request.authToken());
         }
         else{
             //Can't delete something that's not there
-            throw
+            throw new DataAccessException();
         }
     }
 }

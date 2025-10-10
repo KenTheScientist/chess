@@ -5,17 +5,20 @@ package handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import dataaccess.DataAccessException;
-import dataaccess.UnauthorizedException;
+import datamodel.ListGameData;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
-import request.LoginRequest;
+import request.ListGamesRequest;
 import request.LogoutRequest;
-import result.LoginResult;
+import result.ListGamesResult;
+import service.GameService;
 import service.UserService;
 
+import java.util.ArrayList;
 
-public class LogoutHandler implements Handler {
+
+public class ListGamesHandler implements Handler {
 
     @Override
     public void handle(@NotNull Context context) {
@@ -31,10 +34,10 @@ public class LogoutHandler implements Handler {
             }
 
             //Now we're going to call for service
-            UserService.logout(new LogoutRequest(authToken));
+            ListGamesResult gameList = GameService.listGames(new ListGamesRequest(authToken));
 
             //We convert the result to a JSON string
-            var result = "{ }";
+            var result = serializer.toJson(gameList);
 
             //We output the JSON string
             context.result(result);
