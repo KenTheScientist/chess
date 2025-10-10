@@ -16,7 +16,7 @@ public class UserService {
     static MemoryAuthDAO memoryAuthDAO = new MemoryAuthDAO();
 
     public static void clearApplication(){
-        memoryAuthDAO.clear();
+        memoryUserDAO.clear();
         memoryAuthDAO.clear();
         GameService.memoryGameDAO.clear();
     }
@@ -44,10 +44,13 @@ public class UserService {
         }
     }
 
-    public static LoginResult login(LoginRequest request) throws UnauthorizedException {
+    public static LoginResult login(LoginRequest request) throws UnauthorizedException, DataAccessException {
 
         UserData searchedUser = memoryUserDAO.getUser(request.username());
 
+        if(searchedUser == null) {
+            throw new DataAccessException();
+        }
         if(!searchedUser.password().equals(request.password()))
         {
             //This user doesn't exist or the password is wrong

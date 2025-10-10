@@ -5,6 +5,7 @@ package handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import dataaccess.AlreadyTakenException;
+import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -33,9 +34,10 @@ public class LoginHandler implements Handler {
             var result = serializer.toJson(loginResult);
 
             //We output the JSON string
+
             context.result(result);
         }
-        catch (UnauthorizedException e)
+        catch (UnauthorizedException | DataAccessException e)
         {
             context.status(401);
             context.result("{\"message\": \"Error: unauthorized\"}");
