@@ -1,21 +1,20 @@
 package handlers;
 
 //My packages
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
-import dataaccess.AlreadyTakenException;
-import request.RegisterRequest;
-import result.RegisterResult;
-import service.UserService;
 
-//External Dependencies
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
+import request.LoginRequest;
+import request.LogoutRequest;
+import result.LoginResult;
+import service.UserService;
 
 
-public class RegisterHandler implements Handler {
+public class LogoutHandler implements Handler {
 
     @Override
     public void handle(@NotNull Context context) {
@@ -23,21 +22,21 @@ public class RegisterHandler implements Handler {
         var serializer = new Gson();
         try {
             //First we're going to deserialize the body
-            var request = serializer.fromJson(body, RegisterRequest.class);
+            var request = serializer.fromJson(body, LogoutRequest.class);
 
             //Now we're going to call for service
-            RegisterResult registerResult = UserService.register(request);
+            UserService.logout(request);
 
             //We convert the result to a JSON string
-            var result = serializer.toJson(registerResult);
+            var result = "{ }";
 
             //We output the JSON string
             context.result(result);
         }
-        catch (AlreadyTakenException e)
+        catch (UnauthorizedException e)
         {
-            context.status(403);
-            context.result("{\"message\": \"Error: already taken\"}");
+            context.status(401);
+            context.result("{\"message\": \"Error: unauthorized\"}");
         }
         catch (JsonParseException e)
         {

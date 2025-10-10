@@ -4,7 +4,7 @@ import datamodel.AuthData;
 import datamodel.UserData;
 
 public interface UserDAO {
-    public UserData getUser(String username);
+    public void clear();
     public void createUser(UserData userData);
-    public void createAuth(AuthData authData);
+    public UserData getUser(String username);
 }

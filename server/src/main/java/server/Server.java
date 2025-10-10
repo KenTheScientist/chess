@@ -16,9 +16,9 @@ public class Server {
         //Register a user
         javalin.post("/user", context -> (new RegisterHandler()).handle(context));
         //Log in a user
-        javalin.post("/session", context -> (new RegisterHandler()).handle(context));
+        javalin.post("/session", context -> (new LoginHandler()).handle(context));
         //Logs out an authenticated user
-        javalin.delete("/session", context -> (new RegisterHandler()).handle(context));
+        javalin.delete("/session", context -> (new LogoutHandler()).handle(context));
         //Lists all the games in the database
         javalin.get("/game", context -> (new RegisterHandler()).handle(context));
         //Create a new Chess game
