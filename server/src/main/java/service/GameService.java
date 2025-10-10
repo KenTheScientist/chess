@@ -1,19 +1,19 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
 import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.ListGameData;
 import datamodel.UserData;
-import request.ListGamesRequest;
-import request.LoginRequest;
-import request.LogoutRequest;
-import request.RegisterRequest;
+import request.*;
+import result.CreateGameResult;
 import result.ListGamesResult;
 import result.LoginResult;
 import result.RegisterResult;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 public class GameService {
@@ -41,6 +41,24 @@ public class GameService {
             ListGamesResult result = new ListGamesResult(resultList);
 
             return result;
+        }
+    }
+
+    public static CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException {
+        //First we have to verify the user
+        AuthData searchingAuthData = UserService.memoryAuthDAO.getAuth(authToken);
+        if(searchingAuthData == null) {
+            //Unauthorized!
+            throw new DataAccessException();
+        }
+        else {
+            //Authenticated!
+            //Create the game
+            int newID = new Random().nextInt(9999);
+            GameData gameData = new GameData(newID,"","", request.gameName(), new ChessGame());
+            memoryGameDAO.createGame(gameData);
+
+            return new CreateGameResult(newID);
         }
     }
 

@@ -15,6 +15,12 @@ public class UserService {
     static MemoryUserDAO memoryUserDAO = new MemoryUserDAO();
     static MemoryAuthDAO memoryAuthDAO = new MemoryAuthDAO();
 
+    public static void clearApplication(){
+        memoryAuthDAO.clear();
+        memoryAuthDAO.clear();
+        GameService.memoryGameDAO.clear();
+    }
+
     public static RegisterResult register(RegisterRequest request) throws AlreadyTakenException {
 
         UserData searchedUser = memoryUserDAO.getUser(request.username());
