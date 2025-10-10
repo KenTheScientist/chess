@@ -1,10 +1,7 @@
 package server;
 
 import handlers.*;
-import dataaccess.*;
 import io.javalin.*;
-import service.GameService;
-import service.UserService;
 
 public class Server {
 
@@ -28,7 +25,7 @@ public class Server {
         //Join a Chess Game
         javalin.put("/game", context -> (new RegisterHandler()).handle(context));
         //Clear ALL data from the database
-        javalin.delete("/db", context -> (new DeleteHandler()).handle(context));
+        javalin.delete("/db", context -> (new ClearApplicationHandler()).handle(context));
 
 
 
