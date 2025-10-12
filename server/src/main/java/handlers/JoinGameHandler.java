@@ -4,7 +4,9 @@ package handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
@@ -38,15 +40,25 @@ public class JoinGameHandler implements Handler {
 
 
         }
-        catch (DataAccessException e)
+        catch (UnauthorizedException e)
         {
             context.status(401);
+            context.result("{\"message\": \"Error: unauthorized\"}");
+        }
+        catch (DataAccessException e)
+        {
+            context.status(400);
             context.result("{\"message\": \"Error: unauthorized\"}");
         }
         catch (JsonParseException e)
         {
             context.status(400);
             context.result("{\"message\": \"Error: bad request\"}");
+        }
+        catch (AlreadyTakenException e)
+        {
+            context.status(403);
+            context.result("{\"message\": \"Error: already taken\"}");
         }
         catch (Exception e) {
             context.status(500);

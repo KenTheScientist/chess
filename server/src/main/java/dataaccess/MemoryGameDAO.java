@@ -34,10 +34,11 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     public void updateGame(int gameID, GameData replacingGameData) throws DataAccessException{
-        for (GameData gameData : gameDataDatabase) {
-            if (gameData.gameID() == gameID) {
+
+        for(int i = 0; i < gameDataDatabase.size(); i++) {
+            if(gameDataDatabase.get(i).gameID() == gameID) {
                 //Found a match!
-                gameData = replacingGameData;
+                gameDataDatabase.set(i,replacingGameData);
                 return;
             }
         }

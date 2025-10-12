@@ -20,12 +20,12 @@ import java.util.UUID;
 public class GameService {
     static MemoryGameDAO memoryGameDAO = new MemoryGameDAO();
 
-    public static ListGamesResult listGames(ListGamesRequest request) throws DataAccessException {
+    public static ListGamesResult listGames(ListGamesRequest request) throws UnauthorizedException {
         //First we have to verify the user
         AuthData searchingAuthData = UserService.memoryAuthDAO.getAuth(request.authToken());
         if(searchingAuthData == null) {
             //Unauthorized!
-            throw new DataAccessException();
+            throw new UnauthorizedException();
         }
         else
         {
@@ -45,12 +45,12 @@ public class GameService {
         }
     }
 
-    public static CreateGameResult createGame(CreateGameRequest request, String authToken) throws DataAccessException {
+    public static CreateGameResult createGame(CreateGameRequest request, String authToken) throws UnauthorizedException {
         //First we have to verify the user
         AuthData searchingAuthData = UserService.memoryAuthDAO.getAuth(authToken);
         if(searchingAuthData == null) {
             //Unauthorized!
-            throw new DataAccessException();
+            throw new UnauthorizedException();
         }
         else {
             //Authenticated!
@@ -63,11 +63,11 @@ public class GameService {
         }
     }
 
-    public static void joinGame(JoinGameRequest request, String authToken) throws DataAccessException, AlreadyTakenException {
+    public static void joinGame(JoinGameRequest request, String authToken) throws DataAccessException, AlreadyTakenException, UnauthorizedException {
         AuthData searchingAuthData = UserService.memoryAuthDAO.getAuth(authToken);
         if(searchingAuthData == null) {
             //Unauthorized!
-            throw new DataAccessException();
+            throw new UnauthorizedException();
         }
         else {
             //Authenticated!
@@ -82,7 +82,7 @@ public class GameService {
                 //Game exists. Now, is there an open color
                 if(request.playerColor().equals("WHITE")){
                     //Check if white exists
-                    if(searchingGameData.whiteUsername() != null){
+                    if(!searchingGameData.whiteUsername().isEmpty()){
                         //Taken!
                         throw new AlreadyTakenException();
                     }
@@ -94,7 +94,7 @@ public class GameService {
                 }
                 else if(request.playerColor().equals("BLACK")){
                     //Check if black exists
-                    if(searchingGameData.blackUsername() != null){
+                    if(!searchingGameData.blackUsername().isEmpty()){
                         //Taken!
                         throw new AlreadyTakenException();
                     }
