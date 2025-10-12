@@ -23,7 +23,7 @@ public class Server {
         //Create a new Chess game
         javalin.post("/game", context -> (new CreateGameHandler()).handle(context));
         //Join a Chess Game
-        javalin.put("/game", context -> (new RegisterHandler()).handle(context));
+        javalin.put("/game", context -> (new JoinGameHandler()).handle(context));
         //Clear ALL data from the database
         javalin.delete("/db", context -> (new ClearApplicationHandler()).handle(context));
 

@@ -12,6 +12,7 @@ import result.ListGamesResult;
 import result.LoginResult;
 import result.RegisterResult;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
@@ -59,6 +60,56 @@ public class GameService {
             memoryGameDAO.createGame(gameData);
 
             return new CreateGameResult(newID);
+        }
+    }
+
+    public static void joinGame(JoinGameRequest request, String authToken) throws DataAccessException, AlreadyTakenException {
+        AuthData searchingAuthData = UserService.memoryAuthDAO.getAuth(authToken);
+        if(searchingAuthData == null) {
+            //Unauthorized!
+            throw new DataAccessException();
+        }
+        else {
+            //Authenticated!
+            //See if the game exists
+            GameData searchingGameData = memoryGameDAO.getGame(request.gameID());
+            if(searchingGameData == null) {
+                //Game not found
+                throw new DataAccessException();
+            }
+            else
+            {
+                //Game exists. Now, is there an open color
+                if(request.playerColor().equals("WHITE")){
+                    //Check if white exists
+                    if(searchingGameData.whiteUsername() != null){
+                        //Taken!
+                        throw new AlreadyTakenException();
+                    }
+                    else {
+                        //Let's add ourselves
+                        GameData placingGameData = new GameData(searchingGameData.gameID(), searchingAuthData.username(), searchingGameData.blackUsername(), searchingGameData.gameName(), searchingGameData.game());
+                        memoryGameDAO.updateGame(placingGameData.gameID(), placingGameData);
+                    }
+                }
+                else if(request.playerColor().equals("BLACK")){
+                    //Check if black exists
+                    if(searchingGameData.blackUsername() != null){
+                        //Taken!
+                        throw new AlreadyTakenException();
+                    }
+                    else {
+                        //Let's add ourselves
+                        GameData placingGameData = new GameData(searchingGameData.gameID(), searchingGameData.whiteUsername(), searchingAuthData.username(), searchingGameData.gameName(), searchingGameData.game());
+                        memoryGameDAO.updateGame(placingGameData.gameID(), placingGameData);
+                    }
+                }
+                else {
+                    //This is a bad request
+                    throw new DataAccessException();
+                }
+
+            }
         }
     }
 
