@@ -88,7 +88,9 @@ public class GameService {
                     }
                     else {
                         //Let's add ourselves
-                        GameData placingGameData = new GameData(searchingGameData.gameID(), searchingAuthData.username(), searchingGameData.blackUsername(), searchingGameData.gameName(), searchingGameData.game());
+                        GameData placingGameData = new GameData(searchingGameData.gameID(),
+                                searchingAuthData.username(), searchingGameData.blackUsername(),
+                                searchingGameData.gameName(), searchingGameData.game());
                         memoryGameDAO.updateGame(placingGameData.gameID(), placingGameData);
                     }
                 }
@@ -100,7 +102,9 @@ public class GameService {
                     }
                     else {
                         //Let's add ourselves
-                        GameData placingGameData = new GameData(searchingGameData.gameID(), searchingGameData.whiteUsername(), searchingAuthData.username(), searchingGameData.gameName(), searchingGameData.game());
+                        GameData placingGameData = new GameData(searchingGameData.gameID(),
+                                searchingGameData.whiteUsername(), searchingAuthData.username(),
+                                searchingGameData.gameName(), searchingGameData.game());
                         memoryGameDAO.updateGame(placingGameData.gameID(), placingGameData);
                     }
                 }

@@ -158,9 +158,12 @@ public class ChessGame {
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition currentPosition = new ChessPosition(i, j);
+
                 if (gameBoard.hasPiece(currentPosition) && !gameBoard.getPiece(currentPosition).getTeamColor().equals(teamColor)) {
                     //We are a piece that could be attacking the king
-                    ArrayList<ChessMove> possibleMoves = (ArrayList<ChessMove>) gameBoard.getPiece(currentPosition).pieceMoves(gameBoard, currentPosition);
+                    ChessPiece currentPiece = gameBoard.getPiece(currentPosition);
+                    var possibleMovesObject = currentPiece.pieceMoves(gameBoard, currentPosition);
+                    ArrayList<ChessMove> possibleMoves = (ArrayList<ChessMove>) possibleMovesObject;
                     //If one of those moves is our king, then we're in check
                     for (int k = 0; k < possibleMoves.size(); k++) {
                         ChessPosition currentEndPos = possibleMoves.get(k).getEndPosition();
@@ -196,7 +199,7 @@ public class ChessGame {
                     if (gameBoard.hasPiece(currentPosition) && gameBoard.getPiece(currentPosition).getTeamColor().equals(teamColor)) {
                         //We are one of our own guys trying to save us!
                         ChessPiece currentPiece = gameBoard.getPiece(currentPosition);
-                        ArrayList<ChessMove> possibleMoves = (ArrayList<ChessMove>) gameBoard.getPiece(currentPosition).pieceMoves(gameBoard, currentPosition);
+                        ArrayList<ChessMove> possibleMoves = (ArrayList<ChessMove>) currentPiece.pieceMoves(gameBoard, currentPosition);
                         for (int k = 0; k < possibleMoves.size(); k++) {
                             ChessMove tryingMove = possibleMoves.get(k);
                             ChessBoard backupBoard = gameBoard.duplicate();
