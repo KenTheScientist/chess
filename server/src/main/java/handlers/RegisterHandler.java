@@ -24,7 +24,9 @@ public class RegisterHandler implements Handler {
         try {
             //First we're going to deserialize the body
             var request = serializer.fromJson(body, RegisterRequest.class);
-
+            if(request.username() == null || request.password() == null || request.email() == null){
+                throw new JsonParseException("Null Variable");
+            }
             //Now we're going to call for service
             RegisterResult registerResult = UserService.register(request);
 

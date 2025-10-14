@@ -27,7 +27,9 @@ public class CreateGameHandler implements Handler {
             //First we're going to deserialize the body
             var authToken = context.header("Authorization");
             var createGameRequest = serializer.fromJson(body, CreateGameRequest.class);
-
+            if(createGameRequest.gameName() == null){
+                throw new JsonParseException("Null Variable");
+            }
             if(authToken == null)
             {
                 throw new DataAccessException();

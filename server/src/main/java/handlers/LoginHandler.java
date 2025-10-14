@@ -26,7 +26,9 @@ public class LoginHandler implements Handler {
         try {
             //First we're going to deserialize the body
             var request = serializer.fromJson(body, LoginRequest.class);
-
+            if(request.username() == null || request.password() == null){
+                throw new JsonParseException("Null Variable");
+            }
             //Now we're going to call for service
             LoginResult loginResult = UserService.login(request);
 

@@ -5,6 +5,7 @@ package handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import dataaccess.DataAccessException;
+import dataaccess.UnauthorizedException;
 import datamodel.ListGameData;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
@@ -42,7 +43,7 @@ public class ListGamesHandler implements Handler {
             //We output the JSON string
             context.result(result);
         }
-        catch (DataAccessException e)
+        catch (DataAccessException | UnauthorizedException e)
         {
             context.status(401);
             context.result("{\"message\": \"Error: unauthorized\"}");

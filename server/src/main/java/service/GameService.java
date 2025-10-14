@@ -56,7 +56,7 @@ public class GameService {
             //Authenticated!
             //Create the game
             int newID = new Random().nextInt(9999);
-            GameData gameData = new GameData(newID,"","", request.gameName(), new ChessGame());
+            GameData gameData = new GameData(newID,null,null, request.gameName(), new ChessGame());
             memoryGameDAO.createGame(gameData);
 
             return new CreateGameResult(newID);
@@ -80,9 +80,9 @@ public class GameService {
             else
             {
                 //Game exists. Now, is there an open color
-                if(request.playerColor().equals("WHITE")){
+                if(request.playerColor() != null && request.playerColor().equals("WHITE")){
                     //Check if white exists
-                    if(!searchingGameData.whiteUsername().isEmpty()){
+                    if(searchingGameData.whiteUsername() != null){
                         //Taken!
                         throw new AlreadyTakenException();
                     }
@@ -92,9 +92,9 @@ public class GameService {
                         memoryGameDAO.updateGame(placingGameData.gameID(), placingGameData);
                     }
                 }
-                else if(request.playerColor().equals("BLACK")){
+                else if(request.playerColor() != null && request.playerColor().equals("BLACK")){
                     //Check if black exists
-                    if(!searchingGameData.blackUsername().isEmpty()){
+                    if(searchingGameData.blackUsername() != null){
                         //Taken!
                         throw new AlreadyTakenException();
                     }
