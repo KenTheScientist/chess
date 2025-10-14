@@ -1,17 +1,8 @@
 package chess;
-
 import java.util.*;
 import java.util.ArrayList;
 
-/**
- * Represents a single chess piece
- * <p>
- * Note: You can add to this class, but you may not alter
- * signature of the existing methods.
- */
 public class ChessPiece {
-
-
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
@@ -48,9 +39,6 @@ public class ChessPiece {
 
     }
 
-    /**
-     * The various different chess piece options
-     */
     public enum PieceType {
         KING,
         QUEEN,
@@ -60,24 +48,13 @@ public class ChessPiece {
         PAWN
     }
 
-    /**
-     * @return Which team this chess piece belongs to
-     */
     public ChessGame.TeamColor getTeamColor() {
         return this.pieceColor;
     }
 
-    /**
-     * @return which type of chess piece this piece is
-     */
     public PieceType getPieceType() {
         return this.type;
     }
-
-
-    /**
-     * Calculates whether a move is valid or not, given a move-to position and color on a board
-     */
 
     public boolean moveValid(ChessBoard board, ChessPosition pos, ChessGame.TeamColor col)
     {
@@ -90,21 +67,11 @@ public class ChessPiece {
         return true;
     }
 
-    /**
-     * Calculates all the positions a chess piece can move to
-     * Does not take into account moves that are illegal due to leaving the king in
-     * danger
-     *
-     * @return Collection of valid moves
-     */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-
         Collection<ChessPosition> possiblePositions = new ArrayList<>(); //List of possible move-to positions
         Collection<ChessMove> possibleMoves = new ArrayList<>(); //Output list of ChessMoves
-
         int myCol = myPosition.col;
         int myRow = myPosition.row;
-
 
         if(type == PieceType.BISHOP) {
             //Go up and right
@@ -267,7 +234,6 @@ public class ChessPiece {
                     break;
                 }
             }
-
             checkingCol = myCol;
             checkingRow = myRow;
             while (true)//DOWN
@@ -438,7 +404,6 @@ public class ChessPiece {
             }
         }
         else if(type == PieceType.PAWN){
-
             if(pieceColor == ChessGame.TeamColor.BLACK){
                 //Heading DOWN
                 //Attack LEFTDOWN
@@ -504,11 +469,7 @@ public class ChessPiece {
 
             }
         }
-
-
-
         //Now fill the possibleMoves collection using the possible positions
-
         if(type != PieceType.PAWN) {
             for (ChessPosition pos : possiblePositions) {
                 possibleMoves.add(new ChessMove(myPosition, pos, null));
@@ -531,8 +492,6 @@ public class ChessPiece {
                 }
             }
         }
-
         return possibleMoves;
-
     }
 }
