@@ -40,7 +40,9 @@ public class ChessPiece {
         int index = type.ordinal();
         char out = options.charAt(index);
 
-        if(pieceColor == ChessGame.TeamColor.WHITE) out = Character.toUpperCase(out);
+        if(pieceColor == ChessGame.TeamColor.WHITE){
+            out = Character.toUpperCase(out);
+        }
 
         return String.valueOf(out);
 
@@ -79,9 +81,11 @@ public class ChessPiece {
 
     public boolean moveValid(ChessBoard board, ChessPosition pos, ChessGame.TeamColor col)
     {
-        if(pos.getColumn() < 1 || pos.getColumn() > 8 || pos.getRow() < 1 || pos.getRow() > 8) return false; // Out of bounds
+        if(pos.getColumn() < 1 || pos.getColumn() > 8 || pos.getRow() < 1 || pos.getRow() > 8) {
+            return false; // Out of bounds
+        }
         if(board.hasPiece(pos)){
-            if(board.getPiece(pos).getTeamColor() == col) return false; //We're on the same team!!!
+            return board.getPiece(pos).getTeamColor() != col; //We're on the same team!!!
         }
         return true;
     }
