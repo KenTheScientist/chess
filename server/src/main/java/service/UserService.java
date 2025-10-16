@@ -67,6 +67,7 @@ public class UserService {
             return new LoginResult(request.username(), generatedAuthtoken);
         }
     }
+
     public static void logout(LogoutRequest request) throws DataAccessException {
         AuthData searchedAuthData = memoryAuthDAO.getAuth(request.authToken());
         if(searchedAuthData != null) {
