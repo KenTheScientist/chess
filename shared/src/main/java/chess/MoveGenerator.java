@@ -42,25 +42,25 @@ public class MoveGenerator {
         int[] colChanges = {1, -1, 0, 0};
         int[] rowChanges = {0, 0, 1, -1};
         for(int i = 0; i < 4; i++){
-            int checkingCol = myCol;
-            int checkingRow = myRow;
+            int currentCol = myCol;
+            int currentRow = myRow;
             while(true){
-                checkingCol += colChanges[i];
-                checkingRow += rowChanges[i];
-                if(checkingCol < 1 || checkingCol > 8 || checkingRow < 1 || checkingRow > 8){
+                currentCol += colChanges[i];
+                currentRow += rowChanges[i];
+                if(currentCol < 1 || currentCol > 8 || currentRow < 1 || currentRow > 8){
                     break; //Out of bounds
                 }
-                if(board.hasPiece(new ChessPosition(checkingRow, checkingCol))){
-                    if(board.getPiece(new ChessPosition(checkingRow, checkingCol)).getTeamColor() == pieceColor){
+                if(board.hasPiece(new ChessPosition(currentRow, currentCol))){
+                    if(board.getPiece(new ChessPosition(currentRow, currentCol)).getTeamColor() == pieceColor){
                         break; //We ran into a friendly piece
                     }
                     else{
-                        possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                        possiblePositions.add(new ChessPosition(currentRow, currentCol));
                         break; //We ran into an enemy piece
                     }
                 }
                 else{
-                    possiblePositions.add(new ChessPosition(checkingRow, checkingCol));
+                    possiblePositions.add(new ChessPosition(currentRow, currentCol));
                 }
             }
         }
