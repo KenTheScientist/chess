@@ -17,7 +17,7 @@ public class ServiceTests {
             UserService.clearApplication();
             Assertions.assertNull(UserService.memoryUserDAO.getUser("username"));
         }
-        catch(AlreadyTakenException _) {
+        catch(AlreadyTakenException e) {
             Assertions.fail("Username taken");
         }
     }
