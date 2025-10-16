@@ -6,24 +6,18 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorizedException;
-import datamodel.ListGameData;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import org.jetbrains.annotations.NotNull;
 import request.ListGamesRequest;
-import request.LogoutRequest;
 import result.ListGamesResult;
 import service.GameService;
-import service.UserService;
-
-import java.util.ArrayList;
 
 
 public class ListGamesHandler implements Handler {
 
     @Override
     public void handle(@NotNull Context context) {
-        String body = context.body();
         var serializer = new Gson();
         try {
             //First we're going to deserialize the body
@@ -43,22 +37,19 @@ public class ListGamesHandler implements Handler {
             //We output the JSON string
             context.result(result);
         }
-        catch (DataAccessException | UnauthorizedException e)
+        catch (DataAccessException | UnauthorizedException exception)
         {
             context.status(401);
             context.result("{\"message\": \"Error: unauthorized\"}");
         }
-        catch (JsonParseException e)
+        catch (JsonParseException exception)
         {
             context.status(400);
             context.result("{\"message\": \"Error: bad request\"}");
         }
-        catch (Exception e) {
+        catch (Exception exception) {
             context.status(500);
-            context.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
-        }
-        finally{
-
+            context.result("{ \"message\": \"Error: " + exception.getMessage() + "\" }");
         }
     }
 
