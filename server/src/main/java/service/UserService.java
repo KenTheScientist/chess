@@ -13,24 +13,7 @@ import java.util.UUID;
 
 public class UserService {
     static UserDAO userDAO;
-
-    static {
-        try {
-            userDAO = new SqlUserDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     static AuthDAO authDAO;
-
-    static {
-        try {
-            authDAO = new SqlAuthDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static void clearApplication() throws DataAccessException {
         userDAO.clear();
