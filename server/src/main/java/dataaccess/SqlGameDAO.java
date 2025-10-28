@@ -1,9 +1,8 @@
 package dataaccess;
 
 import datamodel.AuthData;
-import datamodel.UserData;
+import datamodel.GameData;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,27 +12,63 @@ import java.util.ArrayList;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class SqlUserDAO implements UserDAO{
+public class SqlGameDAO implements AuthDAO{
 
     //Constructor
-    public SqlUserDAO() throws DataAccessException {
+    public SqlGameDAO() throws DataAccessException {
         configureDatabase();
     }
 
     public void clear() throws DataAccessException {
-        var statement = "TRUNCATE user";
+        var statement = "TRUNCATE game";
         executeUpdate(statement);
     }
 
-    //Gets the user data given a username
-    public UserData getUser(String username) throws DataAccessException {
+    public void createGame(GameData gameData) {
+        var statement = "INSERT INTO game (authToken, username) VALUES (?, ?)";
+        executeUpdate(statement, authData.authToken(), authData.username());
+    }
+
+
+    public GameData getGame(int gameID) {
+
+    }
+
+
+    public ArrayList<GameData> listGames() {
+
+    }
+
+
+    public void updateGame(int gameID, GameData replacingGameData) throws DataAccessException {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Gets the AuthData given the authToken
+    public AuthData getAuth(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT * FROM user WHERE username=?";
+            var statement = "SELECT * FROM auth WHERE authToken=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
-                ps.setString(1, username);
+                ps.setString(1, authToken);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return readUser(rs);
+                        return readAuth(rs);
                     }
                 }
             }
@@ -44,19 +79,24 @@ public class SqlUserDAO implements UserDAO{
     }
 
     //Places the given UserData in the database
-    public void createUser(UserData userData) throws DataAccessException {
-        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, userData.username(), userData.password(), userData.email());
+    public void createAuth(AuthData authData) throws DataAccessException {
+        var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
+        executeUpdate(statement, authData.authToken(), authData.username());
     }
 
-    private UserData readUser(ResultSet rs) throws SQLException {
+    //Deletes the AuthData given the authToken
+    public void deleteAuth(String authToken) throws DataAccessException {
+        var statement = "DELETE FROM auth WHERE authToken=?";
+        executeUpdate(statement,authToken);
+    }
+
+    private AuthData readAuth(ResultSet rs) throws SQLException {
+        var authToken = rs.getString("authToken");
         var username = rs.getString("username");
-        var password = rs.getString("password");
-        var email = rs.getString("email");
-        return new UserData(username, email, password);
+        return new AuthData(authToken,username);
     }
 
-    private void executeUpdate(String statement, Object... params) throws DataAccessException {
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
@@ -66,7 +106,13 @@ public class SqlUserDAO implements UserDAO{
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();
-                //ResultSet rs = ps.getGeneratedKeys();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
             }
         } catch (SQLException e) {
             throw new DataAccessException();
@@ -75,11 +121,10 @@ public class SqlUserDAO implements UserDAO{
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  user (
+            CREATE TABLE IF NOT EXISTS  auth (
+              `authToken` varchar(256) NOT NULL,
               `username` varchar(256) NOT NULL,
-              `password` varchar(256) NOT NULL,
-              `email` varchar(256) NOT NULL,
-              PRIMARY KEY (`username`),
+              PRIMARY KEY (`authToken`),
               INDEX(username)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
