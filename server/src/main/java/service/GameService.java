@@ -18,11 +18,19 @@ import java.util.Random;
 import java.util.UUID;
 
 public class GameService {
-    static MemoryGameDAO memoryGameDAO = new MemoryGameDAO();
+    static GameDAO gameDAO;
 
-    public static ListGamesResult listGames(ListGamesRequest request) throws UnauthorizedException {
+    static {
+        try {
+            gameDAO = new SqlGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ListGamesResult listGames(ListGamesRequest request) throws UnauthorizedException, DataAccessException {
         //First we have to verify the user
-        AuthData searchingAuthData = UserService.memoryAuthDAO.getAuth(request.authToken());
+        AuthData searchingAuthData = UserService.authDAO.getAuth(request.authToken());
         if(searchingAuthData == null) {
             //Unauthorized!
             throw new UnauthorizedException();
@@ -30,7 +38,7 @@ public class GameService {
         else
         {
             //Get the game list
-            ArrayList<GameData> gameList = memoryGameDAO.listGames();
+            ArrayList<GameData> gameList = gameDAO.listGames();
 
             //Convert it to this modified list
             ArrayList<ListGameData> resultList = new ArrayList<>();
@@ -45,9 +53,9 @@ public class GameService {
         }
     }
 
-    public static CreateGameResult createGame(CreateGameRequest request, String authToken) throws UnauthorizedException {
+    public static CreateGameResult createGame(CreateGameRequest request, String authToken) throws UnauthorizedException, DataAccessException {
         //First we have to verify the user
-        AuthData searchingAuthData = UserService.memoryAuthDAO.getAuth(authToken);
+        AuthData searchingAuthData = UserService.authDAO.getAuth(authToken);
         if(searchingAuthData == null) {
             //Unauthorized!
             throw new UnauthorizedException();
@@ -57,14 +65,14 @@ public class GameService {
             //Create the game
             int newID = new Random().nextInt(9999);
             GameData gameData = new GameData(newID,null,null, request.gameName(), new ChessGame());
-            memoryGameDAO.createGame(gameData);
+            gameDAO.createGame(gameData);
 
             return new CreateGameResult(newID);
         }
     }
 
     public static void joinGame(JoinGameRequest request, String authToken) throws DataAccessException, AlreadyTakenException, UnauthorizedException {
-        AuthData searchingAuthData = UserService.memoryAuthDAO.getAuth(authToken);
+        AuthData searchingAuthData = UserService.authDAO.getAuth(authToken);
         if(searchingAuthData == null) {
             //Unauthorized!
             throw new UnauthorizedException();
@@ -72,7 +80,7 @@ public class GameService {
         else {
             //Authenticated!
             //See if the game exists
-            GameData searchingGameData = memoryGameDAO.getGame(request.gameID());
+            GameData searchingGameData = gameDAO.getGame(request.gameID());
             if(searchingGameData == null) {
                 //Game not found
                 throw new DataAccessException();
@@ -91,7 +99,7 @@ public class GameService {
                         GameData placingGameData = new GameData(searchingGameData.gameID(),
                                 searchingAuthData.username(), searchingGameData.blackUsername(),
                                 searchingGameData.gameName(), searchingGameData.game());
-                        memoryGameDAO.updateGame(placingGameData.gameID(), placingGameData);
+                        gameDAO.updateGame(placingGameData.gameID(), placingGameData);
                     }
                 }
                 else if(request.playerColor() != null && request.playerColor().equals("BLACK")){
@@ -105,7 +113,7 @@ public class GameService {
                         GameData placingGameData = new GameData(searchingGameData.gameID(),
                                 searchingGameData.whiteUsername(), searchingAuthData.username(),
                                 searchingGameData.gameName(), searchingGameData.game());
-                        memoryGameDAO.updateGame(placingGameData.gameID(), placingGameData);
+                        gameDAO.updateGame(placingGameData.gameID(), placingGameData);
                     }
                 }
                 else {

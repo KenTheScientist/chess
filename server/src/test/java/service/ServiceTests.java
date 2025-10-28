@@ -17,10 +17,10 @@ public class ServiceTests {
 
 
     @BeforeEach
-    void setup(){
-        UserService.memoryUserDAO.clear();
-        UserService.memoryAuthDAO.clear();
-        GameService.memoryGameDAO.clear();
+    void setup() throws DataAccessException {
+        UserService.userDAO.clear();
+        UserService.authDAO.clear();
+        GameService.gameDAO.clear();
     }
 
     @Test
@@ -30,10 +30,12 @@ public class ServiceTests {
         try {
             UserService.register(new RegisterRequest("username", "password", "email@email.com"));
             UserService.clearApplication();
-            Assertions.assertNull(UserService.memoryUserDAO.getUser("username"));
+            Assertions.assertNull(UserService.userDAO.getUser("username"));
         }
         catch(AlreadyTakenException e) {
             Assertions.fail("Username taken");
+        } catch (DataAccessException e) {
+            Assertions.fail("DataAccess error");
         }
     }
 
@@ -44,10 +46,12 @@ public class ServiceTests {
         try {
             UserService.register(new RegisterRequest("username", "password", "email@email.com"));
             Assertions.assertEquals(new UserData("username", "password",  "email@email.com"),
-                    UserService.memoryUserDAO.getUser("username"));
+                    UserService.userDAO.getUser("username"));
         }
         catch(AlreadyTakenException e) {
             Assertions.fail("Username taken");
+        } catch (DataAccessException e) {
+            Assertions.fail("DataAccess error");
         }
     }
 
@@ -68,7 +72,7 @@ public class ServiceTests {
         try {
             UserService.register(new RegisterRequest("username", "password", "email@email.com"));
             LoginResult result = UserService.login(new LoginRequest("username","password"));
-            Assertions.assertEquals(new AuthData(result.authToken(),result.username()), UserService.memoryAuthDAO.getAuth(result.authToken()));
+            Assertions.assertEquals(new AuthData(result.authToken(),result.username()), UserService.authDAO.getAuth(result.authToken()));
         }
         catch(Exception e){
             Assertions.fail(e.getMessage());
@@ -90,7 +94,7 @@ public class ServiceTests {
             RegisterResult result = UserService.register(new RegisterRequest("username", "password", "email@email.com"));
             UserService.logout(new LogoutRequest(result.authToken()));
 
-            Assertions.assertNull(UserService.memoryAuthDAO.getAuth(result.authToken()));
+            Assertions.assertNull(UserService.authDAO.getAuth(result.authToken()));
         }
         catch(Exception e){
             Assertions.fail(e.getMessage());
@@ -112,7 +116,7 @@ public class ServiceTests {
             RegisterResult result = UserService.register(new RegisterRequest("username", "password", "email@email.com"));
             CreateGameResult createResult = GameService.createGame(new CreateGameRequest("gameName"), result.authToken());
 
-            Assertions.assertNotNull(GameService.memoryGameDAO.getGame(createResult.gameID()));
+            Assertions.assertNotNull(GameService.gameDAO.getGame(createResult.gameID()));
         }
         catch(Exception e){
             Assertions.fail(e.getMessage());
@@ -158,7 +162,7 @@ public class ServiceTests {
             RegisterResult result = UserService.register(new RegisterRequest("username", "password", "email@email.com"));
             CreateGameResult createResult = GameService.createGame(new CreateGameRequest("gameName"), result.authToken());
             GameService.joinGame(new JoinGameRequest("WHITE", createResult.gameID()), result.authToken());
-            Assertions.assertEquals("username", GameService.memoryGameDAO.getGame(createResult.gameID()).whiteUsername());
+            Assertions.assertEquals("username", GameService.gameDAO.getGame(createResult.gameID()).whiteUsername());
         }
         catch(Exception e){
             Assertions.fail(e.getMessage());

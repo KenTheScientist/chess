@@ -12,18 +12,35 @@ import result.RegisterResult;
 import java.util.UUID;
 
 public class UserService {
-    static MemoryUserDAO memoryUserDAO = new MemoryUserDAO();
-    static MemoryAuthDAO memoryAuthDAO = new MemoryAuthDAO();
+    static UserDAO userDAO;
 
-    public static void clearApplication(){
-        memoryUserDAO.clear();
-        memoryAuthDAO.clear();
-        GameService.memoryGameDAO.clear();
+    static {
+        try {
+            userDAO = new SqlUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static RegisterResult register(RegisterRequest request) throws AlreadyTakenException {
+    static AuthDAO authDAO;
 
-        UserData searchedUser = memoryUserDAO.getUser(request.username());
+    static {
+        try {
+            authDAO = new SqlAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void clearApplication() throws DataAccessException {
+        userDAO.clear();
+        authDAO.clear();
+        GameService.gameDAO.clear();
+    }
+
+    public static RegisterResult register(RegisterRequest request) throws AlreadyTakenException, DataAccessException {
+
+        UserData searchedUser = userDAO.getUser(request.username());
 
         if(searchedUser != null)
         {
@@ -32,13 +49,13 @@ public class UserService {
         }
         else{
             //Let's place a new UserData in there
-            memoryUserDAO.createUser(new UserData(request.username(), request.password(), request.email()));
+            userDAO.createUser(new UserData(request.username(), request.password(), request.email()));
 
             //Let's generate the new auth token
             String generatedAuthtoken = UUID.randomUUID().toString();
 
             //Let's place the new AuthData in there
-            memoryAuthDAO.createAuth(new AuthData(generatedAuthtoken, request.username()));
+            authDAO.createAuth(new AuthData(generatedAuthtoken, request.username()));
 
             return new RegisterResult(request.username(), generatedAuthtoken);
         }
@@ -46,7 +63,7 @@ public class UserService {
 
     public static LoginResult login(LoginRequest request) throws UnauthorizedException, DataAccessException {
 
-        UserData searchedUser = memoryUserDAO.getUser(request.username());
+        UserData searchedUser = userDAO.getUser(request.username());
 
         if(searchedUser == null) {
             throw new DataAccessException();
@@ -62,17 +79,17 @@ public class UserService {
             String generatedAuthtoken = UUID.randomUUID().toString();
 
             //Let's place the new AuthData in there
-            memoryAuthDAO.createAuth(new AuthData(generatedAuthtoken, request.username()));
+            authDAO.createAuth(new AuthData(generatedAuthtoken, request.username()));
 
             return new LoginResult(request.username(), generatedAuthtoken);
         }
     }
 
     public static void logout(LogoutRequest request) throws DataAccessException {
-        AuthData searchedAuthData = memoryAuthDAO.getAuth(request.authToken());
+        AuthData searchedAuthData = authDAO.getAuth(request.authToken());
         if(searchedAuthData != null) {
             //Found a match
-            memoryAuthDAO.deleteAuth(request.authToken());
+            authDAO.deleteAuth(request.authToken());
         }
         else{
             //Can't delete something that's not there

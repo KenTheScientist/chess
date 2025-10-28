@@ -6,10 +6,10 @@ import datamodel.UserData;
 import java.util.ArrayList;
 
 public interface GameDAO {
-    public void clear();
-    public void createGame(GameData gameData);
-    public GameData getGame(int gameID);
-    public ArrayList<GameData> listGames();
+    public void clear() throws DataAccessException;
+    public void createGame(GameData gameData) throws DataAccessException;
+    public GameData getGame(int gameID) throws DataAccessException;
+    public ArrayList<GameData> listGames() throws DataAccessException;
     public void updateGame(int gameID, GameData replacingGameData) throws DataAccessException;
 
 }
