@@ -12,7 +12,16 @@ import result.RegisterResult;
 import java.util.UUID;
 
 public class UserService {
-    static UserDAO userDAO = new MemoryUserDAO();
+    static UserDAO userDAO;
+
+    static {
+        try {
+            userDAO = new SqlUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     static AuthDAO authDAO;
 
     static {

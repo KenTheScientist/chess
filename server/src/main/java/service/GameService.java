@@ -18,8 +18,15 @@ import java.util.Random;
 import java.util.UUID;
 
 public class GameService {
-    static GameDAO gameDAO = new MemoryGameDAO();
+    static GameDAO gameDAO;
 
+    static {
+        try {
+            gameDAO = new SqlGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     public static ListGamesResult listGames(ListGamesRequest request) throws UnauthorizedException, DataAccessException {
