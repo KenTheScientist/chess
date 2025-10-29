@@ -2,9 +2,7 @@ package handlers;
 
 //My packages
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 import dataaccess.AlreadyTakenException;
-import dataaccess.DataAccessException;
 import request.RegisterRequest;
 import result.RegisterResult;
 import service.UserService;
@@ -51,9 +49,6 @@ public class RegisterHandler implements Handler {
         catch (Exception e) {
             context.status(500);
             context.result("{ \"message\": \"Error: " + e.getClass().getName() + "\" }");
-        }
-        finally{
-
         }
     }
 
