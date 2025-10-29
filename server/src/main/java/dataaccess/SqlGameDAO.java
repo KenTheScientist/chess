@@ -2,7 +2,6 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import datamodel.AuthData;
 import datamodel.GameData;
 
 import java.sql.Connection;
@@ -27,7 +26,8 @@ public class SqlGameDAO implements GameDAO{
     }
 
     public void createGame(GameData gameData) throws DataAccessException {
-        var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?, ?)";
+        var statement = "INSERT INTO game (gameID, whiteUsername, blackUsername, " +
+                "gameName, game) VALUES (?, ?, ?, ?, ?)";
 
         String json = new Gson().toJson(gameData.game());
 
@@ -111,13 +111,16 @@ public class SqlGameDAO implements GameDAO{
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < parameters.length; i++) {
                     Object param = parameters[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
+                    switch (param) {
+                        case String p -> ps.setString(i + 1, p);
+                        case Integer p -> ps.setInt(i + 1, p);
+                        case null -> ps.setNull(i + 1, NULL);
+                        default -> {
+                        }
+                    }
 
                 }
                 ps.executeUpdate();
-                ResultSet rs = ps.getGeneratedKeys();
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());

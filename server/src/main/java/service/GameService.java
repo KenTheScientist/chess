@@ -5,17 +5,11 @@ import dataaccess.*;
 import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.ListGameData;
-import datamodel.UserData;
 import request.*;
 import result.CreateGameResult;
 import result.ListGamesResult;
-import result.LoginResult;
-import result.RegisterResult;
-
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.UUID;
 
 public class GameService {
     static GameDAO gameDAO;
@@ -48,9 +42,7 @@ public class GameService {
                 resultList.add(new ListGameData(game.gameID(),game.whiteUsername(),game.blackUsername(),game.gameName()));
             }
 
-            ListGamesResult result = new ListGamesResult(resultList);
-
-            return result;
+            return new ListGamesResult(resultList);
         }
     }
 
