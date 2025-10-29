@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
+import dataaccess.ResponseException;
 import dataaccess.UnauthorizedException;
 import datamodel.AuthData;
 import datamodel.UserData;
@@ -17,7 +18,7 @@ public class ServiceTests {
 
 
     @BeforeEach
-    void setup() throws DataAccessException {
+    void setup() throws DataAccessException, ResponseException {
         UserService.userDAO.clear();
         UserService.authDAO.clear();
         GameService.gameDAO.clear();
@@ -36,6 +37,8 @@ public class ServiceTests {
             Assertions.fail("Username taken");
         } catch (DataAccessException e) {
             Assertions.fail("DataAccess error");
+        } catch (ResponseException e) {
+            Assertions.fail("Server error");
         }
     }
 
@@ -52,6 +55,8 @@ public class ServiceTests {
             Assertions.fail("Username taken");
         } catch (DataAccessException e) {
             Assertions.fail("DataAccess error");
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
         }
     }
 

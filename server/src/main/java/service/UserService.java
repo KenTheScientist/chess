@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import datamodel.AuthData;
 import datamodel.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import request.LoginRequest;
 import request.LogoutRequest;
 import request.RegisterRequest;
@@ -17,7 +18,7 @@ public class UserService {
     static {
         try {
             userDAO = new SqlUserDAO();
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | ResponseException e) {
             throw new RuntimeException(e);
         }
     }
@@ -27,18 +28,18 @@ public class UserService {
     static {
         try {
             authDAO = new SqlAuthDAO();
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | ResponseException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void clearApplication() throws DataAccessException {
+    public static void clearApplication() throws DataAccessException, ResponseException {
         userDAO.clear();
         authDAO.clear();
         GameService.gameDAO.clear();
     }
 
-    public static RegisterResult register(RegisterRequest request) throws AlreadyTakenException, DataAccessException {
+    public static RegisterResult register(RegisterRequest request) throws AlreadyTakenException, DataAccessException, ResponseException {
 
         UserData searchedUser = userDAO.getUser(request.username());
 
@@ -61,14 +62,15 @@ public class UserService {
         }
     }
 
-    public static LoginResult login(LoginRequest request) throws UnauthorizedException, DataAccessException {
+    public static LoginResult login(LoginRequest request) throws UnauthorizedException, DataAccessException, ResponseException {
 
         UserData searchedUser = userDAO.getUser(request.username());
 
         if(searchedUser == null) {
             throw new DataAccessException();
         }
-        if(!searchedUser.password().equals(request.password()))
+
+        if(!BCrypt.checkpw(request.password(),searchedUser.password()))
         {
             //This user doesn't exist or the password is wrong
             System.out.println(searchedUser.password());
@@ -85,7 +87,7 @@ public class UserService {
         }
     }
 
-    public static void logout(LogoutRequest request) throws DataAccessException {
+    public static void logout(LogoutRequest request) throws DataAccessException, ResponseException {
         AuthData searchedAuthData = authDAO.getAuth(request.authToken());
         if(searchedAuthData != null) {
             //Found a match

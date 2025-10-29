@@ -41,6 +41,7 @@ public class LoginHandler implements Handler {
         }
         catch (UnauthorizedException | DataAccessException e)
         {
+            System.out.println(e.getClass().getName());
             context.status(401);
             context.result("{\"message\": \"Error: unauthorized\"}");
         }

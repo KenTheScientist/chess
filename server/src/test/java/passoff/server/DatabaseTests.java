@@ -127,7 +127,7 @@ public class DatabaseTests {
             for (Supplier<TestResult> operation : operations) {
                 TestResult result = operation.get();
                 Assertions.assertEquals(500, serverFacade.getStatusCode(),
-                        "Server response code was not 500 Internal Error");
+                        "Server response code was not 500 Internal Error" + operation);
                 Assertions.assertNotNull(result.getMessage(), "Invalid Request didn't return an error message");
                 Assertions.assertTrue(result.getMessage().toLowerCase(Locale.ROOT).contains("error"),
                         "Error message didn't contain the word \"Error\"");

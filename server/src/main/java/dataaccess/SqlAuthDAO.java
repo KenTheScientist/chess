@@ -12,17 +12,17 @@ import static java.sql.Types.NULL;
 public class SqlAuthDAO implements AuthDAO{
 
     //Constructor
-    public SqlAuthDAO() throws DataAccessException {
+    public SqlAuthDAO() throws DataAccessException, ResponseException {
         configureDatabase();
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException, ResponseException {
         var statement = "TRUNCATE auth";
         executeUpdate(statement);
     }
 
     //Gets the AuthData given the authToken
-    public AuthData getAuth(String authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException, ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM auth WHERE authToken=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -34,19 +34,19 @@ public class SqlAuthDAO implements AuthDAO{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException();
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to read data: %s", e.getMessage()));
         }
         return null;
     }
 
     //Places the given UserData in the database
-    public void createAuth(AuthData authData) throws DataAccessException {
+    public void createAuth(AuthData authData) throws DataAccessException, ResponseException {
         var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";
         executeUpdate(statement, authData.authToken(), authData.username());
     }
 
     //Deletes the AuthData given the authToken
-    public void deleteAuth(String authToken) throws DataAccessException {
+    public void deleteAuth(String authToken) throws DataAccessException, ResponseException {
         var statement = "DELETE FROM auth WHERE authToken=?";
         executeUpdate(statement,authToken);
     }
@@ -57,7 +57,7 @@ public class SqlAuthDAO implements AuthDAO{
         return new AuthData(authToken,username);
     }
 
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+    private int executeUpdate(String statement, Object... params) throws DataAccessException, ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
@@ -76,7 +76,7 @@ public class SqlAuthDAO implements AuthDAO{
                 return 0;
             }
         } catch (SQLException e) {
-            throw new DataAccessException();
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to update data: %s", e.getMessage()));
         }
     }
 
@@ -91,7 +91,7 @@ public class SqlAuthDAO implements AuthDAO{
             """
     };
 
-    private void configureDatabase() throws DataAccessException {
+    private void configureDatabase() throws DataAccessException, ResponseException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
@@ -100,7 +100,7 @@ public class SqlAuthDAO implements AuthDAO{
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException();
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
 

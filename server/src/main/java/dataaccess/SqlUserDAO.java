@@ -1,6 +1,7 @@
 package dataaccess;
 
 import datamodel.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,17 +14,17 @@ import static java.sql.Types.NULL;
 public class SqlUserDAO implements UserDAO{
 
     //Constructor
-    public SqlUserDAO() throws DataAccessException {
+    public SqlUserDAO() throws DataAccessException, ResponseException {
         configureDatabase();
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException, ResponseException {
         var statement = "TRUNCATE user";
         executeUpdate(statement);
     }
 
     //Gets the user data given a username
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) throws ResponseException {
 
         try (Connection conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM user WHERE username=?";
@@ -36,15 +37,16 @@ public class SqlUserDAO implements UserDAO{
                 }
             }
         } catch (Exception e) {
-            throw new DataAccessException();
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to read data: %s", e.getMessage()));
         }
         return null;
     }
 
     //Places the given UserData in the database
-    public void createUser(UserData userData) throws DataAccessException {
+    public void createUser(UserData userData) throws DataAccessException, ResponseException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, userData.username(), userData.password(), userData.email());
+        var encryptedPassword = BCrypt.hashpw(userData.password(), BCrypt.gensalt());
+        executeUpdate(statement, userData.username(), encryptedPassword, userData.email());
     }
 
     private UserData readUser(ResultSet rs) throws SQLException {
@@ -54,7 +56,7 @@ public class SqlUserDAO implements UserDAO{
         return new UserData(username, password, email);
     }
 
-    private void executeUpdate(String statement, Object... params) throws DataAccessException {
+    private void executeUpdate(String statement, Object... params) throws DataAccessException, ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
@@ -71,7 +73,7 @@ public class SqlUserDAO implements UserDAO{
                 //ResultSet rs = ps.getGeneratedKeys();
             }
         } catch (SQLException e) {
-            throw new DataAccessException();
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to read data: %s", e.getMessage()));
         }
     }
 
@@ -87,7 +89,7 @@ public class SqlUserDAO implements UserDAO{
             """
     };
 
-    private void configureDatabase() throws DataAccessException {
+    private void configureDatabase() throws DataAccessException, ResponseException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
@@ -96,7 +98,7 @@ public class SqlUserDAO implements UserDAO{
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException();
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }
 
