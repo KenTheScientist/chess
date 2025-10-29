@@ -4,6 +4,7 @@ package handlers;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import dataaccess.AlreadyTakenException;
+import dataaccess.DataAccessException;
 import request.RegisterRequest;
 import result.RegisterResult;
 import service.UserService;
@@ -33,6 +34,7 @@ public class RegisterHandler implements Handler {
             //We convert the result to a JSON string
             var result = serializer.toJson(registerResult);
 
+
             //We output the JSON string
             context.result(result);
         }
@@ -48,7 +50,7 @@ public class RegisterHandler implements Handler {
         }
         catch (Exception e) {
             context.status(500);
-            context.result("{ \"message\": \"Error: " + e.getMessage() + "\" }");
+            context.result("{ \"message\": \"Error: " + e.getClass().getName() + "\" }");
         }
         finally{
 
