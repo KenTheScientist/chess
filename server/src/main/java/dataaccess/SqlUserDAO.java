@@ -24,6 +24,7 @@ public class SqlUserDAO implements UserDAO{
 
     //Gets the user data given a username
     public UserData getUser(String username) throws DataAccessException {
+
         try (Connection conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM user WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -50,7 +51,7 @@ public class SqlUserDAO implements UserDAO{
         var username = rs.getString("username");
         var password = rs.getString("password");
         var email = rs.getString("email");
-        return new UserData(username, email, password);
+        return new UserData(username, password, email);
     }
 
     private void executeUpdate(String statement, Object... params) throws DataAccessException {

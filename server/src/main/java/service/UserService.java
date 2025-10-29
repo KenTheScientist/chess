@@ -71,7 +71,7 @@ public class UserService {
         if(!searchedUser.password().equals(request.password()))
         {
             //This user doesn't exist or the password is wrong
-
+            System.out.println(searchedUser.password());
             throw new UnauthorizedException();
         }
         else{
