@@ -2,8 +2,6 @@ package dataaccess;
 
 import datamodel.AuthData;
 
-import java.util.ArrayList;
-
 import java.sql.*;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -22,7 +20,7 @@ public class SqlAuthDAO implements AuthDAO{
     }
 
     //Gets the AuthData given the authToken
-    public AuthData getAuth(String authToken) throws DataAccessException, ResponseException {
+    public AuthData getAuth(String authToken) throws ResponseException {
         try (Connection conn = DatabaseManager.getConnection()) {
             var statement = "SELECT * FROM auth WHERE authToken=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
@@ -65,9 +63,13 @@ public class SqlAuthDAO implements AuthDAO{
             try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
+                    switch (param) {
+                        case String p -> ps.setString(i + 1, p);
+                        case Integer p -> ps.setInt(i + 1, p);
+                        case null -> ps.setNull(i + 1, NULL);
+                        default -> {
+                        }
+                    }
                 }
                 ps.executeUpdate();
 
@@ -96,9 +98,9 @@ public class SqlAuthDAO implements AuthDAO{
 
     private void configureDatabase() throws DataAccessException, ResponseException {
         DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection connection = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var preparedStatement = connection.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }

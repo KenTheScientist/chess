@@ -56,24 +56,23 @@ public class SqlUserDAO implements UserDAO{
         return new UserData(username, password, email);
     }
 
-    private void executeUpdate(String statement, Object... params) throws DataAccessException, ResponseException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
+    private void executeUpdate(String statement, Object... parameters) throws DataAccessException, ResponseException {
+        try (Connection connection = DatabaseManager.getConnection()) {
+            PreparedStatement ps = connection.prepareStatement(statement, RETURN_GENERATED_KEYS);
+            for (int i = 0; i < parameters.length; i++) {
+                Object param = parameters[i];
+                switch (param) {
+                    case String p -> ps.setString(i + 1, p);
+                    case Integer p -> ps.setInt(i + 1, p);
+                    case null -> ps.setNull(i + 1, NULL);
+                    default -> {
                     }
                 }
                 ps.executeUpdate();
-                //ResultSet rs = ps.getGeneratedKeys();
             }
         } catch (SQLException e) {
-            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to read data: %s", e.getMessage()));
+            System.out.println(e.getMessage());
+            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to update data: %s", e.getMessage()));
         }
     }
 
@@ -91,9 +90,9 @@ public class SqlUserDAO implements UserDAO{
 
     private void configureDatabase() throws DataAccessException, ResponseException {
         DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection connect = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var preparedStatement = connect.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }

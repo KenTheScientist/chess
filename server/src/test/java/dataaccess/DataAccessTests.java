@@ -77,9 +77,9 @@ public class DataAccessTests {
     @DisplayName("AuthDao - getAuth Positive")
     public void authDaoGetAuthPositive() {
         try {
-            UserService.authDAO.createAuth(new AuthData("1234", "username"));
-            AuthData result = UserService.authDAO.getAuth("1234");
-            Assertions.assertEquals(new AuthData("1234", "username"), result);
+            UserService.authDAO.createAuth(new AuthData("12345", "username"));
+            AuthData result = UserService.authDAO.getAuth("12345");
+            Assertions.assertEquals(new AuthData("12345", "username"), result);
         } catch (DataAccessException e) {
             Assertions.fail("DataAccess error");
         } catch (ResponseException e) {
@@ -187,9 +187,9 @@ public class DataAccessTests {
     @DisplayName("GameDao - createGame Positive")
     public void gameDaoCreateGamePositive() {
         try {
-            GameService.gameDAO.createGame(new GameData(1234, null, null, "name", new ChessGame()));
-            GameData result = GameService.gameDAO.getGame(1234);
-            Assertions.assertEquals(new GameData(1234, null, null, "name", new ChessGame()), result);
+            GameService.gameDAO.createGame(new GameData(12345, null, null, "name", new ChessGame()));
+            GameData result = GameService.gameDAO.getGame(12345);
+            Assertions.assertEquals(new GameData(12345, null, null, "name", new ChessGame()), result);
         } catch (DataAccessException e) {
             Assertions.fail("DataAccess error");
         } catch (ResponseException e) {
