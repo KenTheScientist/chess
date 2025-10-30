@@ -107,21 +107,21 @@ public class SqlGameDAO implements GameDAO{
     }
 
     private void executeUpdate(String statement, Object... parameters) throws DataAccessException, ResponseException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < parameters.length; i++) {
-                    Object param = parameters[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
+        try (Connection connect = DatabaseManager.getConnection()) {
+            PreparedStatement ps = connect.prepareStatement(statement, RETURN_GENERATED_KEYS);
+            for (int i = 0; i < parameters.length; i++) {
+                Object param = parameters[i];
+                switch (param) {
+                    case String p -> ps.setString(i + 1, p);
+                    case Integer p -> ps.setInt(i + 1, p);
+                    case null -> ps.setNull(i + 1, NULL);
+                    default -> {
                     }
-
                 }
-                ps.executeUpdate();
+
             }
+            ps.executeUpdate();
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to update data: %s", e.getMessage()));

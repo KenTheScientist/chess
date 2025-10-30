@@ -57,21 +57,21 @@ public class SqlUserDAO implements UserDAO{
     }
 
     private void executeUpdate(String statement, Object... params) throws DataAccessException, ResponseException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    switch (param) {
-                        case String p -> ps.setString(i + 1, p);
-                        case Integer p -> ps.setInt(i + 1, p);
-                        case null -> ps.setNull(i + 1, NULL);
-                        default -> {
-                        }
+        try (Connection connection = DatabaseManager.getConnection()) {
+            PreparedStatement ps = connection.prepareStatement(statement, RETURN_GENERATED_KEYS);
+            for (int i = 0; i < params.length; i++) {
+                Object param = params[i];
+                switch (param) {
+                    case String p -> ps.setString(i + 1, p);
+                    case Integer p -> ps.setInt(i + 1, p);
+                    case null -> ps.setNull(i + 1, NULL);
+                    default -> {
                     }
                 }
-                ps.executeUpdate();
-                //ResultSet rs = ps.getGeneratedKeys();
             }
+            ps.executeUpdate();
+            //ResultSet rs = ps.getGeneratedKeys();
+
         } catch (SQLException e) {
             throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to read data: %s", e.getMessage()));
         }
