@@ -15,7 +15,7 @@ public class SqlUserDAO implements UserDAO{
 
     //Constructor
     public SqlUserDAO() throws DataAccessException, ResponseException {
-        configureDatabase();
+        configureUserDatabase();
     }
 
     public void clear() throws DataAccessException, ResponseException {
@@ -89,11 +89,11 @@ public class SqlUserDAO implements UserDAO{
             """
     };
 
-    private void configureDatabase() throws DataAccessException, ResponseException {
+    private void configureUserDatabase() throws DataAccessException, ResponseException {
         DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection connection = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var preparedStatement = connection.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }

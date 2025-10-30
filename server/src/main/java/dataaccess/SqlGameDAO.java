@@ -17,7 +17,7 @@ public class SqlGameDAO implements GameDAO{
 
     //Constructor
     public SqlGameDAO() throws DataAccessException, ResponseException {
-        configureDatabase();
+        configureGameDatabase();
     }
 
     public void clear() throws DataAccessException, ResponseException {
@@ -142,11 +142,11 @@ public class SqlGameDAO implements GameDAO{
             """
     };
 
-    private void configureDatabase() throws DataAccessException, ResponseException {
+    private void configureGameDatabase() throws DataAccessException, ResponseException {
         DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection connect = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var preparedStatement = connect.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }

@@ -46,7 +46,8 @@ public class GameService {
         }
     }
 
-    public static CreateGameResult createGame(CreateGameRequest request, String authToken) throws UnauthorizedException, DataAccessException, ResponseException {
+    public static CreateGameResult createGame(CreateGameRequest request, String authToken)
+            throws UnauthorizedException, DataAccessException, ResponseException {
         //First we have to verify the user
         AuthData searchingAuthData = UserService.authDAO.getAuth(authToken);
         if(searchingAuthData == null) {
@@ -64,7 +65,8 @@ public class GameService {
         }
     }
 
-    public static void joinGame(JoinGameRequest request, String authToken) throws DataAccessException, AlreadyTakenException, UnauthorizedException, ResponseException {
+    public static void joinGame(JoinGameRequest request, String authToken)
+            throws DataAccessException, AlreadyTakenException, UnauthorizedException, ResponseException {
         AuthData searchingAuthData = UserService.authDAO.getAuth(authToken);
         if(searchingAuthData == null) {
             //Unauthorized!
