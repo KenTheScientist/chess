@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GameService {
-    static GameDAO gameDAO;
+    public static GameDAO gameDAO;
 
     static {
         try {

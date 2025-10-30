@@ -13,7 +13,7 @@ import result.RegisterResult;
 import java.util.UUID;
 
 public class UserService {
-    static UserDAO userDAO;
+    public static UserDAO userDAO;
 
     static {
         try {
@@ -23,7 +23,7 @@ public class UserService {
         }
     }
 
-    static AuthDAO authDAO;
+    public static AuthDAO authDAO;
 
     static {
         try {
