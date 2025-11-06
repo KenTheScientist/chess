@@ -68,20 +68,37 @@ public class ServerFacade {
         var request = buildRequest("GET", "/game", authToken, null);
         var response = sendRequest(request);
         return handleResponse(response, ClientListGamesResult.class);
-
-
     }
 
-    public void createGame(String gameName, String authToken) {
-        //returns a gameID string
+    public ClientCreateGameResult createGame(String gameName, String authToken) throws ResponseException {
+        //returns a gameID int
+        var request = buildRequest("POST", "/game", authToken,
+                "{\n" +
+                        "  \"gameName\": \"" + gameName + "\"\n" +
+                        "}");
+        var response = sendRequest(request);
+
+        return handleResponse(response, ClientCreateGameResult.class);
     }
 
-    public void joinGame(String authToken, String playerColor, int gameID) {
+    public void joinGame(String authToken, String playerColor, int gameID) throws ResponseException {
         //Returns nothing
+        var request = buildRequest("PUT", "/game", authToken,
+                "{\n" +
+                        "  \"playerColor\": \"" + playerColor + "\",\n" +
+                        "  \"gameID\": " + gameID + "\n" +
+                        "}");
+        var response = sendRequest(request);
+
+        handleResponse(response, null);
     }
 
-    public void clearData() {
+    public void clearData() throws ResponseException {
         //Returns nothing
+        var request = buildRequest("DELETE", "/db", null, null);
+        var response = sendRequest(request);
+
+        handleResponse(response, null);
     }
 
     /*
