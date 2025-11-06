@@ -2,7 +2,7 @@ package service;
 
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
-import dataaccess.ResponseException;
+import chess.ResponseException;
 import dataaccess.UnauthorizedException;
 import datamodel.AuthData;
 import datamodel.UserData;

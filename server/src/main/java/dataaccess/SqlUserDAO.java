@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ResponseException;
 import datamodel.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 

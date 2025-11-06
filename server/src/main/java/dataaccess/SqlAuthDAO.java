@@ -1,8 +1,7 @@
 package dataaccess;
 
+import chess.ResponseException;
 import datamodel.AuthData;
-
-import java.util.ArrayList;
 
 import java.sql.*;
 

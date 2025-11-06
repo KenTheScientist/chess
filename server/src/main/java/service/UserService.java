@@ -1,5 +1,6 @@
 package service;
 
+import chess.ResponseException;
 import dataaccess.*;
 import datamodel.AuthData;
 import datamodel.UserData;

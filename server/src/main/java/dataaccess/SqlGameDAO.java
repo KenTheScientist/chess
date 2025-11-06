@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ResponseException;
 import com.google.gson.Gson;
 import datamodel.GameData;
 

@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import chess.ResponseException;
 import dataaccess.*;
 import datamodel.AuthData;
 import datamodel.GameData;

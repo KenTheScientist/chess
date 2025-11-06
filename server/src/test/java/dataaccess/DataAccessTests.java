@@ -1,16 +1,11 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ResponseException;
 import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.UserData;
 import org.junit.jupiter.api.*;
-import org.mindrot.jbcrypt.BCrypt;
-import request.*;
-import result.CreateGameResult;
-import result.ListGamesResult;
-import result.LoginResult;
-import result.RegisterResult;
 import service.GameService;
 import service.UserService;
 

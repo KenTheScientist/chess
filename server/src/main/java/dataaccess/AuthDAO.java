@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ResponseException;
 import datamodel.AuthData;
 
 public interface AuthDAO {

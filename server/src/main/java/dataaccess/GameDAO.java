@@ -1,7 +1,7 @@
 package dataaccess;
 
+import chess.ResponseException;
 import datamodel.GameData;
-import datamodel.UserData;
 
 import java.util.ArrayList;
 

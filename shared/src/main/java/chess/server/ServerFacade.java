@@ -1,5 +1,6 @@
 package chess.server;
 
+import chess.ResponseException;
 import com.google.gson.Gson;
 
 import java.net.*;
@@ -14,6 +15,73 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
+    }
+
+    public ClientLoginResult register(String username, String password, String email) throws ResponseException {
+        // returns username & authToken strings
+        var request = buildRequest("POST", "/user", null,
+                "{\n" +
+                "  \"username\": \"" + username + "\",\n" +
+                "  \"password\": \"" + password + "\",\n" +
+                "  \"email\": \"" + email + "\"\n" +
+                "}");
+        var response = sendRequest(request);
+
+        return handleResponse(response, ClientLoginResult.class);
+    }
+
+    public ClientLoginResult login(String username, String password) throws ResponseException {
+        //Returns username and authToken strings
+        var request = buildRequest("POST", "/session", null,
+                "{\n" +
+                        "  \"username\": \"" + username + "\",\n" +
+                        "  \"password\": \"" + password + "\"\n" +
+                        "}");
+        var response = sendRequest(request);
+
+        return handleResponse(response, ClientLoginResult.class);
+    }
+
+    public void logout(String authToken) throws ResponseException {
+        //Doesn't return anything!
+        var request = buildRequest("DELETE", "/session", authToken, null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
+    public ClientListGamesResult listGames(String authToken) throws ResponseException {
+        //Returns a complex system of games. Example:
+//        200: OK
+//
+//        {
+//            "games": [
+    //            {
+    //                "gameID": 3102,
+    //                    "gameName": "gameName"
+    //            },
+    //            {
+    //                "gameID": 9027,
+    //                    "gameName": "gameName"
+    //            }
+//              ]
+//        }
+        var request = buildRequest("GET", "/game", authToken, null);
+        var response = sendRequest(request);
+        return handleResponse(response, ClientListGamesResult.class);
+
+
+    }
+
+    public void createGame(String gameName, String authToken) {
+        //returns a gameID string
+    }
+
+    public void joinGame(String authToken, String playerColor, int gameID) {
+        //Returns nothing
+    }
+
+    public void clearData() {
+        //Returns nothing
     }
 
     /*
@@ -41,19 +109,24 @@ public class ServerFacade {
         return handleResponse(response, PetList.class);
     }
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
+     */
+
+    private HttpRequest buildRequest(String method, String path, String authToken, String body) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
+        if(authToken != null) {
+            request.setHeader("Authorization", authToken);
+        }
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
         }
         return request.build();
     }
 
-    private BodyPublisher makeRequestBody(Object request) {
+    private BodyPublisher makeRequestBody(String request) {
         if (request != null) {
-            return BodyPublishers.ofString(new Gson().toJson(request));
+            return BodyPublishers.ofString(request);
         } else {
             return BodyPublishers.noBody();
         }
@@ -89,5 +162,4 @@ public class ServerFacade {
         return status / 100 == 2;
     }
 
-     */
 }
