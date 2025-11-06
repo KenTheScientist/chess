@@ -17,6 +17,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+
     public ClientLoginResult register(String username, String password, String email) throws ResponseException {
         // returns username & authToken strings
         var request = buildRequest("POST", "/user", null,
