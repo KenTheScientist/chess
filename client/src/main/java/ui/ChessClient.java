@@ -208,14 +208,17 @@ public class ChessClient {
                     - help - get help with possible commands
                     """;
         }
-        return """
-                - listgames - get a list of active games
-                - playgame <GAME NUMBER> <PLAYER COLOR> - join an online game
-                - creategame <GAME NAME> - create a new online game
-                - observegame - observe a game
-                - logout - log out of account
-                - help - get help with possible commands
-                """;
+        else if(state == State.SIGNEDIN) {
+            return """
+                    - listgames - get a list of active games
+                    - playgame <GAME NUMBER> <PLAYER COLOR> - join an online game
+                    - creategame <GAME NAME> - create a new online game
+                    - observegame - observe a game
+                    - logout - log out of account
+                    - help - get help with possible commands
+                    """;
+        }
+        return "";
     }
 
     private void assertSignedIn() throws ResponseException {
