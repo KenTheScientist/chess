@@ -24,7 +24,7 @@ public class ChessClient {
         OBSERVING
     }
 
-    private State state = State.INGAME;
+    private State state = State.SIGNEDOUT;
 
     public ChessClient(String serverUrl) {
         serverFacade = new ServerFacade(serverUrl);
@@ -37,33 +37,22 @@ public class ChessClient {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while(!result.equals("quit")){
-            if(state == State.SIGNEDOUT || state == State.SIGNEDIN) {
-                System.out.print(">>>");
-                String line = scanner.nextLine();
-                try {
-                    result = eval(line);
-                    System.out.println(result);
-                } catch (Throwable e) {
-                    var msg = e.toString();
-                    System.out.print(msg);
-                    System.out.print("\n");
-                }
-            }
-            else if(state == State.INGAME){
+            if(state == State.INGAME || state == State.OBSERVING) {
                 System.out.print(BoardRenderer.render(currentGame.gameBoard, currentColor));
-                System.out.print("\n>>>");
-                String line = scanner.nextLine();
-                try {
-
-                    System.out.println(line);
-                } catch (Throwable e) {
-                    var msg = e.toString();
-                    System.out.print(msg);
-                    System.out.print("\n");
-                }
+                System.out.print("\n");
             }
-
+            System.out.print(">>>");
+            String line = scanner.nextLine();
+            try {
+                result = eval(line);
+                System.out.println(result);
+            } catch (Throwable e) {
+                var msg = e.toString();
+                System.out.print(e.getStackTrace().toString());
+                System.out.print("\n");
+            }
         }
+
     }
 
     //Game functions
@@ -129,6 +118,7 @@ public class ChessClient {
             serverFacade.joinGame(authToken,params[1].toUpperCase(),foundGameData.gameID());
             currentGameID = foundGameData.gameID();
             state = State.INGAME;
+            currentColor = params[1].toUpperCase();
             return String.format("Successfully joined game %s as %s!",
                     foundGameData.gameName(), params[1].toUpperCase());
 
@@ -156,6 +146,7 @@ public class ChessClient {
         if(params.length >= 1) {
             ClientCreateGameResult result = serverFacade.createGame(params[0],authToken);
             state = State.OBSERVING;
+            currentColor = "WHITE";
             return String.format("Successfully observing game %s", params[0]);
         }
         else {

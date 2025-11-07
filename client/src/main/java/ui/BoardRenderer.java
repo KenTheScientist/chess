@@ -13,7 +13,6 @@ public class BoardRenderer {
 
     public static String render(ChessBoard board, String ownerColor) {
         ArrayList<String> out = new ArrayList<>();
-        ownerColor = "BLACK";//REMOVE THIS!
         //Header
         StringBuilder header = new StringBuilder();
         header.append(RCodes.SET_BG_COLOR_BLACK);
