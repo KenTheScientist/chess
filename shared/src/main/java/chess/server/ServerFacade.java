@@ -102,32 +102,6 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    /*
-    public void addPet(Pet pet) throws ResponseException {
-        var request = buildRequest("POST", "/pet", pet);
-        var response = sendRequest(request);
-        return handleResponse(response, Pet.class);
-    }
-
-    public void deletePet(int id) throws ResponseException {
-        var path = String.format("/pet/%s", id);
-        var request = buildRequest("DELETE", path, null);
-        var response = sendRequest(request);
-        handleResponse(response, null);
-    }
-
-    public void deleteAllPets() throws ResponseException {
-        var request = buildRequest("DELETE", "/pet", null);
-        sendRequest(request);
-    }
-
-    public PetList listPets() throws ResponseException {
-        var request = buildRequest("GET", "/pet", null);
-        var response = sendRequest(request);
-        return handleResponse(response, PetList.class);
-    }
-
-     */
 
     private HttpRequest buildRequest(String method, String path, String authToken, String body) {
         var request = HttpRequest.newBuilder()
