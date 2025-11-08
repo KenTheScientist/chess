@@ -1,6 +1,8 @@
 package chess;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +26,14 @@ public class ResponseException extends Exception {
     }
 
     public static ResponseException fromJson(String json) {
-        var map = new Gson().fromJson(json, HashMap.class);
-        String message = map.get("message").toString();
+        String message = "";
+        try {
+            var map = new Gson().fromJson(json, HashMap.class);
+            message = map.get("message").toString();
+        }
+        catch(JsonSyntaxException e){
+            message = json;
+        }
         return new ResponseException(Code.ServerError, message);
     }
 

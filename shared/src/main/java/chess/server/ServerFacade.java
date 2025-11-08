@@ -27,7 +27,6 @@ public class ServerFacade {
                 "  \"email\": \"" + email + "\"\n" +
                 "}");
         var response = sendRequest(request);
-
         return handleResponse(response, ClientLoginResult.class);
     }
 
