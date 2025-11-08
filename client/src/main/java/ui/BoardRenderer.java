@@ -6,8 +6,8 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 public class BoardRenderer {
 
@@ -18,7 +18,9 @@ public class BoardRenderer {
         header.append(RCodes.SET_BG_COLOR_BLACK);
         header.append("   ");
         String[] labels = new String[] {"a","b","c","d","e","f","g","h"};
-        if(ownerColor == "BLACK") labels = new String[] {"h","g","f","e","d","c","b","a"};;
+        if(Objects.equals(ownerColor, "BLACK")) {
+            labels = new String[] {"h","g","f","e","d","c","b","a"};
+        }
         for (String label : labels) {
             header.append(" ");
             header.append(label);
@@ -35,7 +37,9 @@ public class BoardRenderer {
             currentRow.append(" ").append(i).append(" ");
             currentRow.append(RCodes.RESET_BG_COLOR);
             var columnSequence = new int[] {1, 2, 3, 4, 5, 6, 7, 8};
-            if(ownerColor == "BLACK") columnSequence = new int[] {8, 7, 6, 5, 4, 3, 2, 1};
+            if(Objects.equals(ownerColor, "BLACK")){
+                columnSequence = new int[] {8, 7, 6, 5, 4, 3, 2, 1};
+            }
             for(int j : columnSequence){
                 if((i + j) % 2 == 0){
                     currentRow.append(RCodes.SET_BG_COLOR_DARK_GREY);

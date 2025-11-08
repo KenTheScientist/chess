@@ -50,21 +50,8 @@ public class ServerFacade {
     }
 
     public ClientListGamesResult listGames(String authToken) throws ResponseException {
-        //Returns a complex system of games. Example:
-//        200: OK
-//
-//        {
-//            "games": [
-    //            {
-    //                "gameID": 3102,
-    //                    "gameName": "gameName"
-    //            },
-    //            {
-    //                "gameID": 9027,
-    //                    "gameName": "gameName"
-    //            }
-//              ]
-//        }
+        //Returns a complex system of games.
+
         var request = buildRequest("GET", "/game", authToken, null);
         var response = sendRequest(request);
         return handleResponse(response, ClientListGamesResult.class);

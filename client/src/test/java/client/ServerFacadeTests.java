@@ -2,7 +2,6 @@ package client;
 
 import chess.ResponseException;
 import chess.server.ServerFacade;
-import dataaccess.AlreadyTakenException;
 import server.Server;
 import org.junit.jupiter.api.*;
 import java.util.*;
@@ -11,10 +10,10 @@ import java.util.*;
 public class ServerFacadeTests {
 
     private static Server server;
-    private static ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+    private static final ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
 
     @BeforeAll
-    public static void init() throws ResponseException {
+    public static void init() {
         server = new Server();
         var port = server.run(8080);
         System.out.println("Started test HTTP server on " + port);
@@ -60,7 +59,7 @@ public class ServerFacadeTests {
     @Test
     @Order(4)
     @DisplayName("Login Negative")
-    public void loginNegative() throws ResponseException {
+    public void loginNegative() {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.login("username2","password"));
     }
 
@@ -75,7 +74,7 @@ public class ServerFacadeTests {
     @Test
     @Order(6)
     @DisplayName("Logout Negative")
-    public void logoutNegative() throws ResponseException {
+    public void logoutNegative() {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.logout("authToken"));
     }
 
@@ -90,7 +89,7 @@ public class ServerFacadeTests {
     @Test
     @Order(8)
     @DisplayName("List Games Negative")
-    public void listGamesNegative() throws ResponseException {
+    public void listGamesNegative() {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.listGames("authToken"));
     }
 
@@ -105,7 +104,7 @@ public class ServerFacadeTests {
     @Test
     @Order(10)
     @DisplayName("Create Game Negative")
-    public void createGameNegative() throws ResponseException {
+    public void createGameNegative() {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.createGame("gameName", "authToken"));
     }
 
@@ -121,15 +120,15 @@ public class ServerFacadeTests {
     @Test
     @Order(12)
     @DisplayName("Join Game Negative")
-    public void joinGameNegative() throws ResponseException {
+    public void joinGameNegative() {
         Assertions.assertThrows(ResponseException.class, () -> serverFacade.joinGame("authToken","WHITE",1234));
     }
 
     @Test
     @Order(13)
     @DisplayName("Clear Data Positive")
-    public void clearDataPositive() throws ResponseException {
-        Assertions.assertDoesNotThrow(() -> serverFacade.clearData());
+    public void clearDataPositive() {
+        Assertions.assertDoesNotThrow(serverFacade::clearData);
     }
 
     
