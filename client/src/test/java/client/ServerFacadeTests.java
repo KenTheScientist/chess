@@ -10,7 +10,7 @@ import java.util.*;
 public class ServerFacadeTests {
 
     private static Server server;
-    private static final ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
+    private static ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
 
     @BeforeAll
     public static void init() {
