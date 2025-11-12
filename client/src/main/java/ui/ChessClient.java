@@ -47,8 +47,8 @@ public class ChessClient {
                 result = eval(line);
                 System.out.println(result);
             } catch (Throwable e) {
-                var msg = e.toString();
-                System.out.print(e.getStackTrace().toString());
+                var msg = e.getMessage();
+                System.out.println(msg);
                 System.out.print("\n");
             }
         }
@@ -94,6 +94,9 @@ public class ChessClient {
         var listGamesResult = serverFacade.listGames(authToken);
         StringBuilder out = new StringBuilder();
         var list = listGamesResult.games;
+        if(list.isEmpty()) {
+            return "No games available.";
+        }
         for(int i = 0; i < list.size(); i++){
             ClientGameData data = list.get(i);
             out.append(i + 1);
@@ -112,13 +115,15 @@ public class ChessClient {
         //playGame(gameNumber, color)
         assertSignedIn();
         if(params.length >= 2) {
-            var listGameResult = serverFacade.listGames(authToken);
-            int searchingIndex = Integer.parseInt(params[0])-1;
-            ClientGameData foundGameData = listGameResult.games.get(searchingIndex);
+            var attemptedColor = params[1];
+            if(!(attemptedColor.equalsIgnoreCase("white") || attemptedColor.equalsIgnoreCase("black"))){
+                throw new ResponseException(ResponseException.Code.ClientError, "Please put 'white' or 'black' as your color.");
+            }
+            ClientGameData foundGameData = findGame(params[0]);
             serverFacade.joinGame(authToken,params[1].toUpperCase(),foundGameData.gameID());
             currentGameID = foundGameData.gameID();
             state = State.INGAME;
-            currentColor = params[1].toUpperCase();
+            currentColor = attemptedColor.toUpperCase();
             return String.format("Successfully joined game %s as %s!",
                     foundGameData.gameName(), params[1].toUpperCase());
 
@@ -144,8 +149,9 @@ public class ChessClient {
         //createGame(gameName)
         assertSignedIn();
         if(params.length >= 1) {
-            ClientCreateGameResult result = serverFacade.createGame(params[0],authToken);
+            ClientGameData foundGameData = findGame(params[0]);
             state = State.OBSERVING;
+            currentGameID = foundGameData.gameID();
             currentColor = "WHITE";
             return String.format("Successfully observing game %s", params[0]);
         }
@@ -166,6 +172,21 @@ public class ChessClient {
 
 
     //Helper functions
+
+    public ClientGameData findGame(String gameNumber) throws ResponseException {
+        var listGameResult = serverFacade.listGames(authToken);
+        try {
+            int searchingIndex = Integer.parseInt(gameNumber) - 1;
+            return listGameResult.games.get(searchingIndex);
+        }
+        catch (NumberFormatException e) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Please input a number.");
+        }
+        catch (IndexOutOfBoundsException e) {
+            throw new ResponseException(ResponseException.Code.ClientError, "Invalid game number.");
+        }
+
+    }
 
     public String eval(String input) {
         try {
