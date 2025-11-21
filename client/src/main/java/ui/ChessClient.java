@@ -205,6 +205,12 @@ public class ChessClient {
                 case "observegame" -> observeGame(params);
                 case "logout" -> logout();
 
+                case "redraw" -> help();
+                case "leave" -> help();
+                case "makemove" -> help();
+                case "resign" -> help();
+                case "highlightlegalmoves" -> help();
+
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -228,6 +234,13 @@ public class ChessClient {
                     - creategame <GAME NAME> - create a new online game
                     - observegame - observe a game
                     - logout - log out of account
+                    - help - get help with possible commands
+                    """;
+        }
+        else if(state == State.INGAME) {
+            return """
+                    - listgames - get a list of active games
+                    - playgame <GAME NUMBER> <PLAYER COLOR> - join an online game
                     - help - get help with possible commands
                     """;
         }
