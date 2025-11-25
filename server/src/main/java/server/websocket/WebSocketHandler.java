@@ -86,8 +86,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var currentGameData = GameService.gameDAO.getGame(command.getGameID());
         var move = command.getMove();
         ChessGame.TeamColor currentTeam = null;
-        if(Objects.equals(currentGameData.whiteUsername(), name)) currentTeam = ChessGame.TeamColor.WHITE;
-        if(Objects.equals(currentGameData.blackUsername(), name)) currentTeam = ChessGame.TeamColor.BLACK;
+        if(Objects.equals(currentGameData.whiteUsername(), name)) {
+            currentTeam = ChessGame.TeamColor.WHITE;
+        }
+        if(Objects.equals(currentGameData.blackUsername(), name)) {
+            currentTeam = ChessGame.TeamColor.BLACK;
+        }
 
         //If we're an observer, we shouldn't be making any moves!
         if(currentTeam == null) {
@@ -173,8 +177,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         var currentGameData = GameService.gameDAO.getGame(command.getGameID());
         ChessGame.TeamColor currentTeam = null;
-        if(Objects.equals(currentGameData.whiteUsername(), name)) currentTeam = ChessGame.TeamColor.WHITE;
-        if(Objects.equals(currentGameData.blackUsername(), name)) currentTeam = ChessGame.TeamColor.BLACK;
+        if(Objects.equals(currentGameData.whiteUsername(), name)) { currentTeam = ChessGame.TeamColor.WHITE; }
+        if(Objects.equals(currentGameData.blackUsername(), name)) { currentTeam = ChessGame.TeamColor.BLACK; }
 
         //If we're an observer, we shouldn't be resigning!
         if(currentTeam == null) {
