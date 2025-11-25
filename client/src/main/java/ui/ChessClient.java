@@ -188,34 +188,62 @@ public class ChessClient implements NotificationHandler {
             throw new ResponseException(ResponseException.Code.ClientError, "Please input a valid move (e.g. move e5f6)");
         }
         var moveText = params[0];
-
+        if(moveText.length() != 4){
+            throw new ResponseException(ResponseException.Code.ClientError, "Please input a valid move (e.g. move e5f6)");
+        }
+        var columnLabels = "abcdefgh";
+        var rowLabels = "12345678";
+        int col1 = 1;
+        int row1 = 1;
+        int col2 = 1;
+        int row2 = 1;
+        try {
+            col1 = columnLabels.indexOf(moveText.charAt(0)) + 1;
+            row1 = rowLabels.indexOf(moveText.charAt(1)) + 1;
+            col2 = columnLabels.indexOf(moveText.charAt(2)) + 1;
+            row2 = rowLabels.indexOf(moveText.charAt(3)) + 1;
+            if(col1 == 0 || row1 == 0 || col2 == 0 || row2 == 0){
+                throw new IndexOutOfBoundsException();
+            }
+        }
+        catch(IndexOutOfBoundsException e){
+            throw new ResponseException(ResponseException.Code.ClientError, "Please input a valid move (e.g. move e5f6)");
+        }
 
         //Validate promotion piece
         String promotionPiece = "";
-        ChessPiece.PieceType promotionPieceType;
+        ChessPiece.PieceType promotionPieceType = null;
         if(params.length > 1){
             promotionPiece = params[1];
             //The user wants to select a promotion piece
             if(promotionPiece.equalsIgnoreCase("QUEEN")){
                 promotionPieceType = ChessPiece.PieceType.QUEEN;
             }
-            if(promotionPiece.equalsIgnoreCase("ROOK")){
+            else if(promotionPiece.equalsIgnoreCase("ROOK")){
                 promotionPieceType = ChessPiece.PieceType.ROOK;
             }
-            if(promotionPiece.equalsIgnoreCase("KNIGHT")){
+            else if(promotionPiece.equalsIgnoreCase("KNIGHT")){
                 promotionPieceType = ChessPiece.PieceType.KNIGHT;
             }
-            if(promotionPiece.equalsIgnoreCase("BISHOP")){
+            else if(promotionPiece.equalsIgnoreCase("BISHOP")){
                 promotionPieceType = ChessPiece.PieceType.BISHOP;
+            }
+            else {
+                throw new ResponseException(ResponseException.Code.ClientError,
+                        "If you are promoting, please input queen, rook, knight, or bishop as the promotion piece.");
             }
 
         }
 
-        ChessMove outMove = new ChessMove()
+        ChessMove outMove = new ChessMove(
+                new ChessPosition(row1,col1),
+                new ChessPosition(row2,col2),
+                promotionPieceType
+                );
 
-        //websocketFacade.makeMove(authToken, currentGameID, newMove);
+        websocketFacade.makeMove(authToken, currentGameID, outMove);
 
-        return "You made a move. (remove this)";
+        return "Move made successfully.";
     }
 
     public String resign() {
