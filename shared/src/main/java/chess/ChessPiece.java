@@ -70,7 +70,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessPosition> possiblePositions = new ArrayList<>(); //List of possible move-to positions
         Collection<ChessMove> possibleMoves = new ArrayList<>(); //Output list of ChessMoves
-        int myCol = myPosition.col;
+        int myCol = myPosition.column;
         int myRow = myPosition.row;
 
         if(type == PieceType.BISHOP) {
