@@ -20,8 +20,7 @@ public class ChessClient {
     public enum State {
         SIGNEDOUT,
         SIGNEDIN,
-        INGAME,
-        OBSERVING
+        INGAME
     }
 
     private State state = State.SIGNEDOUT;
@@ -37,10 +36,6 @@ public class ChessClient {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while(!result.equals("quit")){
-            if(state == State.INGAME || state == State.OBSERVING) {
-                //System.out.print(BoardRenderer.render(currentGame.gameBoard, currentColor));
-                System.out.print("\n");
-            }
             System.out.print(">>>");
             String line = scanner.nextLine();
             try {
@@ -150,7 +145,7 @@ public class ChessClient {
         assertSignedIn();
         if(params.length >= 1) {
             ClientGameData foundGameData = findGame(params[0]);
-            state = State.OBSERVING;
+            state = State.INGAME;
             currentGameID = foundGameData.gameID();
             currentColor = "WHITE";
             return String.format("Successfully observing game %s", params[0]);
@@ -239,11 +234,15 @@ public class ChessClient {
         }
         else if(state == State.INGAME) {
             return """
-                    - listgames - get a list of active games
-                    - playgame <GAME NUMBER> <PLAYER COLOR> - join an online game
+                    - redraw - redraw the chess board
+                    - move <MOVE> - make a move. Example: move e5f6
+                    - showmoves <POSITION> - highlight the legal moves of a chess piece. Example: showmoves e5
+                    - resign - forfeit the game
+                    - leave - leave the game
                     - help - get help with possible commands
                     """;
         }
+
         return "";
     }
 
