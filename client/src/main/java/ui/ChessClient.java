@@ -1,17 +1,23 @@
 package ui;
 
-import chess.ChessGame;
-import chess.ResponseException;
+import chess.*;
 import chess.server.ClientCreateGameResult;
 import chess.server.ClientGameData;
 import chess.server.ServerFacade;
+import websocket.NotificationHandler;
+import websocket.WebsocketFacade;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler {
 
     private final ServerFacade serverFacade;
+    private final WebsocketFacade websocketFacade;
     private String authToken;
     private int currentGameID;
     private ChessGame currentGame = new ChessGame();
@@ -27,6 +33,7 @@ public class ChessClient {
 
     public ChessClient(String serverUrl) {
         serverFacade = new ServerFacade(serverUrl);
+        websocketFacade = new WebsocketFacade(serverUrl, this);
     }
 
     public void run(){
@@ -36,7 +43,7 @@ public class ChessClient {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while(!result.equals("quit")){
-            System.out.print(">>>");
+            if(state != State.INGAME) { System.out.print(">>>"); }
             String line = scanner.nextLine();
             try {
                 result = eval(line);
@@ -49,9 +56,6 @@ public class ChessClient {
         }
 
     }
-
-    //Game functions
-
 
     // Command functions
     public String register(String[] params) throws ResponseException {
@@ -119,6 +123,9 @@ public class ChessClient {
             currentGameID = foundGameData.gameID();
             state = State.INGAME;
             currentColor = attemptedColor.toUpperCase();
+            websocketFacade.connect(authToken, currentGameID);
+
+
             return String.format("Successfully joined game %s as %s!",
                     foundGameData.gameName(), params[1].toUpperCase());
 
@@ -163,7 +170,86 @@ public class ChessClient {
         return "Successfully signed out.";
     }
 
+    //Websocket (phase 6)
 
+    public String redraw() {
+        return BoardRenderer.render(currentGame.getBoard(), currentColor);
+    }
+
+    public String leave() {
+        websocketFacade.leave(authToken, currentGameID);
+        state = State.SIGNEDIN;
+        return "You left the game.";
+    }
+
+    public String move(String[] params) throws ResponseException {
+        //Validate move parameter
+        if(params.length == 0){
+            throw new ResponseException(ResponseException.Code.ClientError, "Please input a valid move (e.g. move e5f6)");
+        }
+        var moveText = params[0];
+
+
+        //Validate promotion piece
+        String promotionPiece = "";
+        ChessPiece.PieceType promotionPieceType;
+        if(params.length > 1){
+            promotionPiece = params[1];
+            //The user wants to select a promotion piece
+            if(promotionPiece.equalsIgnoreCase("QUEEN")){
+                promotionPieceType = ChessPiece.PieceType.QUEEN;
+            }
+            if(promotionPiece.equalsIgnoreCase("ROOK")){
+                promotionPieceType = ChessPiece.PieceType.ROOK;
+            }
+            if(promotionPiece.equalsIgnoreCase("KNIGHT")){
+                promotionPieceType = ChessPiece.PieceType.KNIGHT;
+            }
+            if(promotionPiece.equalsIgnoreCase("BISHOP")){
+                promotionPieceType = ChessPiece.PieceType.BISHOP;
+            }
+
+        }
+
+        ChessMove outMove = new ChessMove()
+
+        //websocketFacade.makeMove(authToken, currentGameID, newMove);
+
+        return "You made a move. (remove this)";
+    }
+
+    public String resign() {
+        return "Resign! (fix this ken)";
+    }
+
+    public String showMoves(String[] params) {
+        return "Show moves! (fix this ken)";
+    }
+
+    @Override
+    public void notify(ServerMessage message){
+        try {
+            switch (message.getServerMessageType()) {
+                case ERROR:
+                    System.out.println(((ErrorMessage) message).getErrorMessage());
+                    break;
+                case LOAD_GAME:
+                    System.out.println(
+                            BoardRenderer.render(
+                                    ((LoadGameMessage) message).getGame().getBoard(), currentColor
+                            )
+                    );
+                    currentGame = ((LoadGameMessage) message).getGame();
+                    break;
+                case NOTIFICATION:
+                    System.out.println(((NotificationMessage) message).getMessage());
+                    break;
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
     //Helper functions
@@ -200,11 +286,11 @@ public class ChessClient {
                 case "observegame" -> observeGame(params);
                 case "logout" -> logout();
 
-                case "redraw" -> help();
-                case "leave" -> help();
-                case "makemove" -> help();
-                case "resign" -> help();
-                case "highlightlegalmoves" -> help();
+                case "redraw" -> redraw();
+                case "leave" -> leave();
+                case "move" -> move(params);
+                case "resign" -> resign();
+                case "showmoves" -> showMoves(params);
 
                 default -> help();
             };
@@ -235,7 +321,7 @@ public class ChessClient {
         else if(state == State.INGAME) {
             return """
                     - redraw - redraw the chess board
-                    - move <MOVE> - make a move. Example: move e5f6
+                    - move <MOVE> (PROMOTION PIECE) - make a move. Examples: move e5f6, move a7a8 queen
                     - showmoves <POSITION> - highlight the legal moves of a chess piece. Example: showmoves e5
                     - resign - forfeit the game
                     - leave - leave the game
