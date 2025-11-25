@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import chess.InvalidMoveException;
 import chess.ResponseException;
 import com.google.gson.Gson;
@@ -79,15 +80,41 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    public void makeMove(MakeMoveCommand command, String name, Session session) throws ResponseException, DataAccessException, InvalidMoveException, IOException {
+    public void makeMove(MakeMoveCommand command, String name, Session session) throws Exception {
         //Change the game
         var currentGameData = GameService.gameDAO.getGame(command.getGameID());
+        var game = currentGameData.game();
         var move = command.getMove();
-        var currentPlayer = "observer";
-        if(Objects.equals(currentGameData.whiteUsername(), name)) currentPlayer = "white";
-        if(Objects.equals(currentGameData.blackUsername(), name)) currentPlayer = "black";
+        ChessGame.TeamColor currentTeam = null;
+        if(Objects.equals(currentGameData.whiteUsername(), name)) currentTeam = ChessGame.TeamColor.WHITE;
+        if(Objects.equals(currentGameData.blackUsername(), name)) currentTeam = ChessGame.TeamColor.BLACK;
 
-        currentGameData.game().makeMove(command.getMove());
+        //If we're an observer, we shouldn't be making any moves!
+        if(currentTeam == null) {
+            throw new DataAccessException("You are observing a game. You cannot make any moves.");
+        }
+
+        //If it's not our turn, we shouldn't be making any moves!
+        if(currentTeam != game.getTeamTurn()){
+            throw new Exception("Please wait for your turn.");
+        }
+
+        //If we're white, we shouldn't be moving any black pieces! or vice versa
+        if(game.getBoard().getPiece(move.getStartPosition()).getTeamColor() != currentTeam){
+            throw new InvalidMoveException();
+        }
+
+        //No errors? Success!
+        currentGameData.game().makeMove(move);
+
+        //Switch the current team
+        if(currentTeam == ChessGame.TeamColor.WHITE){
+            currentGameData.game().setTeamTurn(ChessGame.TeamColor.BLACK);
+        }
+        if(currentTeam == ChessGame.TeamColor.BLACK){
+            currentGameData.game().setTeamTurn(ChessGame.TeamColor.WHITE);
+        }
+
 
 
         GameService.gameDAO.updateGame(command.getGameID(), currentGameData);
