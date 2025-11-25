@@ -83,7 +83,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void makeMove(MakeMoveCommand command, String name, Session session) throws Exception {
         //Change the game
         var currentGameData = GameService.gameDAO.getGame(command.getGameID());
-        var game = currentGameData.game();
         var move = command.getMove();
         ChessGame.TeamColor currentTeam = null;
         if(Objects.equals(currentGameData.whiteUsername(), name)) currentTeam = ChessGame.TeamColor.WHITE;
@@ -91,16 +90,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         //If we're an observer, we shouldn't be making any moves!
         if(currentTeam == null) {
-            throw new DataAccessException("You are observing a game. You cannot make any moves.");
+            throw new Exception("You are observing the game. You cannot make any moves.");
+        }
+
+        //If the game is over
+        if(!currentGameData.game().gameInProgress){
+            throw new Exception("The game is over. You cannot make any moves.");
         }
 
         //If it's not our turn, we shouldn't be making any moves!
-        if(currentTeam != game.getTeamTurn()){
+        if(currentTeam != currentGameData.game().getTeamTurn()){
             throw new Exception("Please wait for your turn.");
         }
 
         //If we're white, we shouldn't be moving any black pieces! or vice versa
-        if(game.getBoard().getPiece(move.getStartPosition()).getTeamColor() != currentTeam){
+        if(currentGameData.game().getBoard().getPiece(move.getStartPosition()).getTeamColor() != currentTeam){
             throw new InvalidMoveException();
         }
 
@@ -115,8 +119,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             currentGameData.game().setTeamTurn(ChessGame.TeamColor.WHITE);
         }
 
-
-
+        //Update the database
         GameService.gameDAO.updateGame(command.getGameID(), currentGameData);
 
         //Load everyone's boards
@@ -137,7 +140,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), null);
     }
 
-    public void resign(UserGameCommand command, String name, Session session) throws IOException {
+    public void resign(UserGameCommand command, String name, Session session) throws Exception {
+
+        var currentGameData = GameService.gameDAO.getGame(command.getGameID());
+        ChessGame.TeamColor currentTeam = null;
+        if(Objects.equals(currentGameData.whiteUsername(), name)) currentTeam = ChessGame.TeamColor.WHITE;
+        if(Objects.equals(currentGameData.blackUsername(), name)) currentTeam = ChessGame.TeamColor.BLACK;
+
+        //If we're an observer, we shouldn't be resigning!
+        if(currentTeam == null) {
+            throw new Exception("You are observing the game. You cannot resign.");
+        }
+
+        //If the game is already over, we can't resign!
+        if(!currentGameData.game().gameInProgress){
+            throw new Exception("The game is over. You cannot resign.");
+        }
+
+        //Mark the game as over
+        currentGameData.game().gameInProgress = false;
+
+        GameService.gameDAO.updateGame(command.getGameID(), currentGameData);
 
         //Notify the resignation to everyone!!
         var message = String.format("%s has resigned!", name);

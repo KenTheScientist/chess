@@ -14,6 +14,7 @@ public class ChessGame {
 
     public ChessBoard gameBoard;
     public TeamColor teamTurn; //Whose turn is it?
+    public boolean gameInProgress = true;
 
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
