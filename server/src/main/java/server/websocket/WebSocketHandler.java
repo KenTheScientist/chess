@@ -5,6 +5,7 @@ import chess.InvalidMoveException;
 import chess.ResponseException;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import datamodel.GameData;
 import io.javalin.websocket.*;
 import org.jetbrains.annotations.NotNull;
 import service.GameService;
@@ -134,10 +135,38 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    public void leave(UserGameCommand command, String name, Session session) throws IOException {
+    public void leave(UserGameCommand command, String name, Session session) throws IOException, ResponseException, DataAccessException {
+        //Leave the websocket session dataset
+        connections.remove(command.getGameID(),session);
+
+        //Leave the SQL database entry
+        var currentGameData = GameService.gameDAO.getGame(command.getGameID());
+        ChessGame.TeamColor currentTeam = null;
+        if(Objects.equals(currentGameData.whiteUsername(), name)) {
+            //Set whiteUsername to null
+            currentGameData = new GameData(
+                    currentGameData.gameID(),
+                    null,
+                    currentGameData.blackUsername(),
+                    currentGameData.gameName(),
+                    currentGameData.game()
+            );
+        }
+        else if(Objects.equals(currentGameData.blackUsername(), name)) {
+            currentGameData = new GameData(
+                    currentGameData.gameID(),
+                    currentGameData.whiteUsername(),
+                    null,
+                    currentGameData.gameName(),
+                    currentGameData.game()
+            );
+        }
+
+        GameService.gameDAO.updateGame(command.getGameID(), currentGameData);
+
         //Notify the leaving to everyone else
         var message = String.format("%s has left the game.", name);
-        connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), null);
+        connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), session);
     }
 
     public void resign(UserGameCommand command, String name, Session session) throws Exception {
