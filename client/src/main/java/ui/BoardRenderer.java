@@ -49,19 +49,19 @@ public class BoardRenderer {
                 if(highlight != null && i == highlight.getRow() && j == highlight.getColumn()){
                     currentRow.append(RCodes.SET_BG_COLOR_BLUE);
                 }
-                else {
-                    if ((i + j) % 2 == 0) {
-                        currentRow.append(RCodes.SET_BG_COLOR_DARK_GREY);
-                        if (highlightedMoves.contains(new ChessPosition(i, j))) {
-                            currentRow.append(RCodes.SET_BG_COLOR_DARK_GREEN);
-                        }
-                    } else {
-                        currentRow.append(RCodes.SET_BG_COLOR_LIGHT_GREY);
-                        if (highlightedMoves.contains(new ChessPosition(i, j))) {
-                            currentRow.append(RCodes.SET_BG_COLOR_GREEN);
-                        }
+                if ((i + j) % 2 == 0) {
+                    currentRow.append(RCodes.SET_BG_COLOR_DARK_GREY);
+                    if (highlightedMoves.contains(new ChessPosition(i, j))) {
+                        currentRow.append(RCodes.SET_BG_COLOR_DARK_GREEN);
                     }
                 }
+                else {
+                    currentRow.append(RCodes.SET_BG_COLOR_LIGHT_GREY);
+                    if (highlightedMoves.contains(new ChessPosition(i, j))) {
+                        currentRow.append(RCodes.SET_BG_COLOR_GREEN);
+                    }
+                }
+
 
                 if(board.hasPiece(new ChessPosition(i, j))){
 
