@@ -157,6 +157,7 @@ public class ChessClient implements NotificationHandler {
             state = State.INGAME;
             currentGameID = foundGameData.gameID();
             currentColor = "WHITE";
+            websocketFacade.connect(authToken, currentGameID);
             return String.format("Successfully observing game %s", params[0]);
         }
         else {
@@ -175,7 +176,7 @@ public class ChessClient implements NotificationHandler {
     //Websocket (phase 6)
 
     public String redraw() {
-        return BoardRenderer.render(currentGame.getBoard(), currentColor, null);
+        return BoardRenderer.render(currentGame, currentColor, null);
     }
 
     public String leave() {
@@ -284,7 +285,7 @@ public class ChessClient implements NotificationHandler {
 
         //We have to check if there is a piece there
         if(currentGame.getBoard().hasPiece(new ChessPosition(row1, col1))){
-            return BoardRenderer.render(currentGame.getBoard(), currentColor, new ChessPosition(row1, col1));
+            return BoardRenderer.render(currentGame, currentColor, new ChessPosition(row1, col1));
         }
         else{
             throw new ResponseException(ResponseException.Code.ClientError, "There is no piece there. Try again.");
@@ -303,7 +304,7 @@ public class ChessClient implements NotificationHandler {
                 case LOAD_GAME:
                     System.out.println(
                             BoardRenderer.render(
-                                    ((LoadGameMessage) message).getGame().getBoard(), currentColor, null
+                                    ((LoadGameMessage) message).getGame(), currentColor, null
                             )
                     );
                     currentGame = ((LoadGameMessage) message).getGame();
@@ -382,7 +383,7 @@ public class ChessClient implements NotificationHandler {
                     - listgames - get a list of active games
                     - playgame <GAME NUMBER> <PLAYER COLOR> - join an online game
                     - creategame <GAME NAME> - create a new online game
-                    - observegame - observe a game
+                    - observegame <GAME NUMBER> - observe a game
                     - logout - log out of account
                     - help - get help with possible commands
                     """;

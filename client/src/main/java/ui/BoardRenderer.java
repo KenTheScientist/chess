@@ -8,12 +8,16 @@ import java.util.Objects;
 
 public class BoardRenderer {
 
-    public static String render(ChessBoard board, String ownerColor, ChessPosition highlight) {
+    public static String render(ChessGame game, String ownerColor, ChessPosition highlight) {
+
         ArrayList<String> out = new ArrayList<>();
         ArrayList<ChessPosition> highlightedMoves = new ArrayList<>();
         if(highlight != null){
-            highlightedMoves = moveList(board, highlight);
+            highlightedMoves = moveList(game, highlight);
         }
+
+        var board = game.getBoard();
+
         //Header
         StringBuilder header = new StringBuilder();
         header.append(RCodes.SET_BG_COLOR_BLACK);
@@ -103,8 +107,8 @@ public class BoardRenderer {
         return outString.toString();
     }
 
-    private static ArrayList<ChessPosition> moveList(ChessBoard board, ChessPosition position){
-        var possibleMoves = (ArrayList<ChessMove>)board.getPiece(position).pieceMoves(board,position);
+    private static ArrayList<ChessPosition> moveList(ChessGame game, ChessPosition position){
+        var possibleMoves = game.validMoves(position);
         var possiblePositions = new ArrayList<ChessPosition>();
         for (ChessMove possibleMove : possibleMoves) {
             possiblePositions.add(possibleMove.getEndPosition());

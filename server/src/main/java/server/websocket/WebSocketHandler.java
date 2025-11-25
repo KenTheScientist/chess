@@ -77,6 +77,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         //Notify all people associated with this game
         var message = String.format("%s joined the game.", name);
+
         connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), session);
 
     }
