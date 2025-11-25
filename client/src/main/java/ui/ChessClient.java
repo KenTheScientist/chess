@@ -243,7 +243,7 @@ public class ChessClient implements NotificationHandler {
 
         websocketFacade.makeMove(authToken, currentGameID, outMove);
 
-        return "Move made successfully.";
+        return "Processing move...";
     }
 
     public String resign() {

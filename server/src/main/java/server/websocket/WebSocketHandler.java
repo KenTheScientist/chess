@@ -62,7 +62,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             msg = "Invalid move! Try another move.";
         }
         else {
-            msg = ex.getClass().toString();
+            msg = ex.getMessage();
         }
         connections.broadcastToSession(new ErrorMessage(msg), session);
     }
@@ -108,9 +108,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             throw new Exception("Please wait for your turn.");
         }
 
-        //If we're white, we shouldn't be moving any black pieces! or vice versa
-        if(currentGameData.game().getBoard().getPiece(move.getStartPosition()).getTeamColor() != currentTeam){
-            throw new InvalidMoveException();
+        if(!currentGameData.game().getBoard().hasPiece(move.getStartPosition())){
+            throw new InvalidMoveException();//Tried to move an empty square
+        }
+        else if(currentGameData.game().getBoard().getPiece(move.getStartPosition()).getTeamColor() != currentTeam){
+            throw new InvalidMoveException();//Tried to move an opponent's piece
         }
 
         //No errors? Success!
@@ -132,7 +134,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 new LoadGameMessage(currentGameData.game()), null);
 
         //Notify everyone else
-        var message = String.format("%s made the move %s", name, command.getMove().toString());
+        var message = String.format("%s made a move.", name);
         connections.broadcastToGame(command.getGameID(),
                 new NotificationMessage(message), session);
 
