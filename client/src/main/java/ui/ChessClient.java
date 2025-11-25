@@ -12,6 +12,7 @@ import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class ChessClient implements NotificationHandler {
@@ -22,6 +23,7 @@ public class ChessClient implements NotificationHandler {
     private int currentGameID;
     private ChessGame currentGame = new ChessGame();
     private String currentColor = "WHITE";
+    private boolean resignConfirmation = false;
 
     public enum State {
         SIGNEDOUT,
@@ -247,7 +249,12 @@ public class ChessClient implements NotificationHandler {
     }
 
     public String resign() {
-        return "Resign! (fix this ken)";
+        if(resignConfirmation){
+            websocketFacade.resign(authToken, currentGameID);
+            return "You have resigned.";
+        }
+        resignConfirmation = true;
+        return "Do you really want to resign? Enter 'resign' again if so. If not, perform another action.";
     }
 
     public String showMoves(String[] params) {
@@ -301,6 +308,7 @@ public class ChessClient implements NotificationHandler {
         try {
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
+            if(resignConfirmation && !Objects.equals(cmd, "resign")) {resignConfirmation = false;}
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch (cmd) {
                 case "register" -> register(params);
@@ -322,6 +330,7 @@ public class ChessClient implements NotificationHandler {
 
                 default -> help();
             };
+
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
