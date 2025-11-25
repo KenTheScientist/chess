@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,8 +8,12 @@ import java.util.Objects;
 
 public class BoardRenderer {
 
-    public static String render(ChessBoard board, String ownerColor) {
+    public static String render(ChessBoard board, String ownerColor, ChessPosition highlight) {
         ArrayList<String> out = new ArrayList<>();
+        ArrayList<ChessPosition> highlightedMoves = new ArrayList<>();
+        if(highlight != null){
+            highlightedMoves = moveList(board, highlight);
+        }
         //Header
         StringBuilder header = new StringBuilder();
         header.append(RCodes.SET_BG_COLOR_BLACK);
@@ -41,12 +42,23 @@ public class BoardRenderer {
                 columnSequence = new int[] {8, 7, 6, 5, 4, 3, 2, 1};
             }
             for(int j : columnSequence){
-                if((i + j) % 2 == 0){
-                    currentRow.append(RCodes.SET_BG_COLOR_DARK_GREY);
+                if(highlight != null && i == highlight.getRow() && j == highlight.getColumn()){
+                    currentRow.append(RCodes.SET_BG_COLOR_BLUE);
                 }
-                else{
-                    currentRow.append(RCodes.SET_BG_COLOR_LIGHT_GREY);
+                else {
+                    if ((i + j) % 2 == 0) {
+                        currentRow.append(RCodes.SET_BG_COLOR_DARK_GREY);
+                        if (highlightedMoves.contains(new ChessPosition(i, j))) {
+                            currentRow.append(RCodes.SET_BG_COLOR_DARK_GREEN);
+                        }
+                    } else {
+                        currentRow.append(RCodes.SET_BG_COLOR_LIGHT_GREY);
+                        if (highlightedMoves.contains(new ChessPosition(i, j))) {
+                            currentRow.append(RCodes.SET_BG_COLOR_GREEN);
+                        }
+                    }
                 }
+
                 if(board.hasPiece(new ChessPosition(i, j))){
 
                     var drawingPiece = board.getPiece(new ChessPosition(i,j));
@@ -89,6 +101,15 @@ public class BoardRenderer {
         }
 
         return outString.toString();
+    }
+
+    private static ArrayList<ChessPosition> moveList(ChessBoard board, ChessPosition position){
+        var possibleMoves = (ArrayList<ChessMove>)board.getPiece(position).pieceMoves(board,position);
+        var possiblePositions = new ArrayList<ChessPosition>();
+        for (ChessMove possibleMove : possibleMoves) {
+            possiblePositions.add(possibleMove.getEndPosition());
+        }
+        return possiblePositions;
     }
 
     private static String getString(ChessPiece drawingPiece) {

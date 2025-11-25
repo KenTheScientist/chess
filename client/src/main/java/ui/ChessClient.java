@@ -175,7 +175,7 @@ public class ChessClient implements NotificationHandler {
     //Websocket (phase 6)
 
     public String redraw() {
-        return BoardRenderer.render(currentGame.getBoard(), currentColor);
+        return BoardRenderer.render(currentGame.getBoard(), currentColor, null);
     }
 
     public String leave() {
@@ -251,14 +251,46 @@ public class ChessClient implements NotificationHandler {
     public String resign() {
         if(resignConfirmation){
             websocketFacade.resign(authToken, currentGameID);
-            return "You have resigned.";
+            return "";
         }
         resignConfirmation = true;
         return "Do you really want to resign? Enter 'resign' again if so. If not, perform another action.";
     }
 
-    public String showMoves(String[] params) {
-        return "Show moves! (fix this ken)";
+    public String showMoves(String[] params) throws ResponseException {
+
+        //We have to validate the input
+        if(params.length == 0){
+            throw new ResponseException(ResponseException.Code.ClientError, "Please input a valid position (e.g. showmoves e5)");
+        }
+        var moveText = params[0];
+        if(moveText.length() != 2){
+            throw new ResponseException(ResponseException.Code.ClientError, "Please input a valid position (e.g. showmoves e5)");
+        }
+        var columnLabels = "abcdefgh";
+        var rowLabels = "12345678";
+        int col1 = 1;
+        int row1 = 1;
+        try {
+            col1 = columnLabels.indexOf(moveText.charAt(0)) + 1;
+            row1 = rowLabels.indexOf(moveText.charAt(1)) + 1;
+            if(col1 == 0 || row1 == 0){
+                throw new IndexOutOfBoundsException();
+            }
+        }
+        catch(IndexOutOfBoundsException e){
+            throw new ResponseException(ResponseException.Code.ClientError, "Please input a valid position (e.g. showmoves e5)");
+        }
+
+        //We have to check if there is a piece there
+        if(currentGame.getBoard().hasPiece(new ChessPosition(row1, col1))){
+            return BoardRenderer.render(currentGame.getBoard(), currentColor, new ChessPosition(row1, col1));
+        }
+        else{
+            throw new ResponseException(ResponseException.Code.ClientError, "There is no piece there. Try again.");
+        }
+
+
     }
 
     @Override
@@ -271,7 +303,7 @@ public class ChessClient implements NotificationHandler {
                 case LOAD_GAME:
                     System.out.println(
                             BoardRenderer.render(
-                                    ((LoadGameMessage) message).getGame().getBoard(), currentColor
+                                    ((LoadGameMessage) message).getGame().getBoard(), currentColor, null
                             )
                     );
                     currentGame = ((LoadGameMessage) message).getGame();
