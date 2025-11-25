@@ -38,7 +38,7 @@ public class ChessClient {
         var result = "";
         while(!result.equals("quit")){
             if(state == State.INGAME || state == State.OBSERVING) {
-                System.out.print(BoardRenderer.render(currentGame.gameBoard, currentColor));
+                //System.out.print(BoardRenderer.render(currentGame.gameBoard, currentColor));
                 System.out.print("\n");
             }
             System.out.print(">>>");

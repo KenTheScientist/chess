@@ -23,7 +23,7 @@ public class UserGameCommand {
     }
 
     public enum CommandType {
-        CONNECT,
+        CONNECT, //
         MAKE_MOVE,
         LEAVE,
         RESIGN
