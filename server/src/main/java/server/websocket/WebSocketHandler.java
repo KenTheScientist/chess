@@ -17,6 +17,7 @@ import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
 import java.io.InvalidClassException;
+import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final ConnectionManager connections = new ConnectionManager();
@@ -44,8 +45,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     MakeMoveCommand makeMoveCommand = new Gson().fromJson(wsMessageContext.message(), MakeMoveCommand.class);
                     makeMove(makeMoveCommand, name, wsMessageContext.session);
                 }
-                case LEAVE -> leave();
-                case RESIGN -> resign();
+                case LEAVE -> leave(command, name, wsMessageContext.session);
+                case RESIGN -> resign(command, name, wsMessageContext.session);
             }
         } catch (Exception ex) {
             handleError(ex, wsMessageContext.session);
@@ -74,14 +75,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
         //Notify all people associated with this game
         var message = String.format("%s joined the game", name);
-        connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), null);
+        connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), session);
 
     }
 
     public void makeMove(MakeMoveCommand command, String name, Session session) throws ResponseException, DataAccessException, InvalidMoveException, IOException {
         //Change the game
         var currentGameData = GameService.gameDAO.getGame(command.getGameID());
+        var move = command.getMove();
+        var currentPlayer = "observer";
+        if(Objects.equals(currentGameData.whiteUsername(), name)) currentPlayer = "white";
+        if(Objects.equals(currentGameData.blackUsername(), name)) currentPlayer = "black";
+
         currentGameData.game().makeMove(command.getMove());
+
 
         GameService.gameDAO.updateGame(command.getGameID(), currentGameData);
 
@@ -90,16 +97,24 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 new LoadGameMessage(currentGameData.game()), null);
 
         //Notify everyone else
-        var message = String.format("%s made the move %s", name, "FIX ME");
+        var message = String.format("%s made the move %s", name, command.getMove().toString());
         connections.broadcastToGame(command.getGameID(),
-                new NotificationMessage(message), null);
+                new NotificationMessage(message), session);
 
 
     }
 
-    public void leave(){
+    public void leave(UserGameCommand command, String name, Session session) throws IOException {
+        //Notify the leaving to everyone else
+        var message = String.format("%s has left the game.", name);
+        connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), null);
     }
 
-    public void resign(){
+    public void resign(UserGameCommand command, String name, Session session) throws IOException {
+
+        //Notify the resignation to everyone!!
+        var message = String.format("%s has resigned!", name);
+        connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), null);
+
     }
 }
