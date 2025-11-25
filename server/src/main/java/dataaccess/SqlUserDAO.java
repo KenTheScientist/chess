@@ -92,9 +92,9 @@ public class SqlUserDAO implements UserDAO{
 
     private void configureUserDatabase() throws DataAccessException, ResponseException {
         DatabaseManager.createDatabase();
-        try (Connection connection = DatabaseManager.getConnection()) {
+        try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
-                try (var preparedStatement = connection.prepareStatement(statement)) {
+                try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
