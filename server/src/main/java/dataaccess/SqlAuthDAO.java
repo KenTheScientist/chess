@@ -94,9 +94,9 @@ public class SqlAuthDAO implements AuthDAO{
 
     private void configureAuthDatabase() throws DataAccessException, ResponseException {
         DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
+        try (Connection connecty = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var preparedStatement = connecty.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
