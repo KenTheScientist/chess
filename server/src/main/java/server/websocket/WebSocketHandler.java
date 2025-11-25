@@ -76,7 +76,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.broadcastToSession(new LoadGameMessage(game), session);
 
         //Notify all people associated with this game
-        var message = String.format("%s joined the game", name);
+        var message = String.format("%s joined the game.", name);
         connections.broadcastToGame(command.getGameID(), new NotificationMessage(message), session);
 
     }
@@ -134,7 +134,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 new LoadGameMessage(currentGameData.game()), null);
 
         //Notify everyone else
-        var message = String.format("%s made a move.", name);
+        var columnLabels = "abcdefgh";
+        var rowLabels = "12345678";
+        var col1 = columnLabels.charAt(move.getStartPosition().getColumn()-1);
+        var row1 = rowLabels.charAt(move.getStartPosition().getRow()-1);
+        var col2 = columnLabels.charAt(move.getEndPosition().getColumn()-1);
+        var row2 = rowLabels.charAt(move.getEndPosition().getRow()-1);
+
+        var message = String.format("%s just made a move from %s%s to %s%s.", name, col1, row1, col2, row2);
         connections.broadcastToGame(command.getGameID(),
                 new NotificationMessage(message), session);
 
